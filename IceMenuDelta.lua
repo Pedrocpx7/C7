@@ -1,0 +1,693 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local callbacks = rawget(_G, "IceMenuUIActions") or {}
+
+local current = playerGui:FindFirstChild("IceMenu")
+if current then
+    current:Destroy()
+end
+
+for _, name in ipairs({"SafeCarGUI", "OrpheusFlyV42", "AmmoInfUnifiedUI", "AutoReviver_Delta", "IceMenuAutoClick"}) do
+    local previous = playerGui:FindFirstChild(name)
+    if previous then
+        previous:Destroy()
+    end
+end
+
+local item = {}
+local blueprint = {
+    {17, "ScreenGui", playerGui, {["ResetOnSpawn"]=false, ["Name"]="IceMenu", ["ZIndexBehavior"]=Enum.ZIndexBehavior.Sibling}},
+    {18, "Frame", 17, {["AnchorPoint"]=Vector2.new(0.5, 0.5), ["ClipsDescendants"]=true, ["Name"]="MainContainer", ["Position"]=UDim2.new(0.5, 0, 0.5, 0), ["Size"]=UDim2.new(0, 750, 0, 500), ["BackgroundTransparency"]=0.05, ["BackgroundColor3"]=Color3.new(1, 1, 1)}},
+    {19, "UICorner", 18, {["CornerRadius"]=UDim.new(0, 12)}},
+    {20, "UIStroke", 18, {["Color"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961), ["Transparency"]=0.7, ["Thickness"]=2}},
+    {21, "Frame", 18, {["BackgroundTransparency"]=1, ["Name"]="DragFrame", ["Size"]=UDim2.new(1, 0, 0, 60)}},
+    {22, "ScrollingFrame", 18, {["ScrollBarImageColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961), ["ScrollBarThickness"]=4, ["BackgroundTransparency"]=0.1, ["Position"]=UDim2.new(0, 0, 0, 80), ["Size"]=UDim2.new(0, 150, 0, 340), ["CanvasSize"]=UDim2.new(0, 0, 0, 240), ["Name"]="TabContainer", ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {23, "UICorner", 22, {["CornerRadius"]=UDim.new(0, 8)}},
+    {24, "UIListLayout", 22, {["SortOrder"]=Enum.SortOrder.LayoutOrder, ["Padding"]=UDim.new(0, 5)}},
+    {25, "Frame", 18, {["BackgroundTransparency"]=0.1, ["Position"]=UDim2.new(0, 0, 0, 0), ["Size"]=UDim2.new(0, 150, 0, 80), ["BackgroundColor3"]=Color3.new(0.9803921568627451, 0.9803921568627451, 1)}},
+    {26, "UICorner", 25, {["CornerRadius"]=UDim.new(0, 8)}},
+    {27, "ImageButton", 25, {["Image"]="rbxassetid://104305180176353", ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.1, 0, 0.1, 0), ["ScaleType"]=Enum.ScaleType.Fit, ["Size"]=UDim2.new(0, 50, 0, 50)}},
+    {28, "TextLabel", 25, {["TextColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961), ["Font"]=Enum.Font.GothamBold, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0, 0, 0.65, 0), ["Text"]="ICE MENU", ["TextSize"]=16, ["Size"]=UDim2.new(1, 0, 0, 25)}},
+    {29, "Frame", 18, {["BackgroundTransparency"]=0.1, ["Position"]=UDim2.new(0.2, 0, 0, 0), ["Size"]=UDim2.new(0, 600, 0, 60), ["BackgroundColor3"]=Color3.new(0.9803921568627451, 0.9803921568627451, 1)}},
+    {30, "UICorner", 29, {["CornerRadius"]=UDim.new(0, 8)}},
+    {31, "TextLabel", 29, {["TextColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961), ["Text"]="Inicio", ["Font"]=Enum.Font.GothamBold, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.02, 0, 0.1, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=18, ["Size"]=UDim2.new(0, 150, 0, 40)}},
+    {32, "TextButton", 29, {["Size"]=UDim2.new(0, 30, 0, 30), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(0, 0.5882352941176471, 0), ["Position"]=UDim2.new(0.78, 0, 0.15, 0), ["Text"]="-", ["TextSize"]=14, ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {33, "UICorner", 32, {["CornerRadius"]=UDim.new(0, 6)}},
+    {34, "TextButton", 29, {["Size"]=UDim2.new(0, 30, 0, 30), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(0.7843137254901961, 0.19607843137254902, 0.19607843137254902), ["Position"]=UDim2.new(0.85, 0, 0.15, 0), ["Text"]="X", ["TextSize"]=14, ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {35, "UICorner", 34, {["CornerRadius"]=UDim.new(0, 6)}},
+    {36, "ScrollingFrame", 18, {["ScrollBarImageColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961), ["CanvasSize"]=UDim2.new(0, 0, 0, 964), ["BackgroundTransparency"]=0.1, ["Position"]=UDim2.new(0.2, 0, 0.12, 0), ["ScrollBarThickness"]=4, ["Size"]=UDim2.new(0, 600, 0, 370), ["BackgroundColor3"]=Color3.new(0.9803921568627451, 0.9803921568627451, 1)}},
+    {37, "UICorner", 36, {["CornerRadius"]=UDim.new(0, 8)}},
+    {38, "UIListLayout", 36, {["SortOrder"]=Enum.SortOrder.LayoutOrder, ["Padding"]=UDim.new(0, 8)}},
+    {39, "Frame", 17, {["Name"]="NotificationContainer", ["Position"]=UDim2.new(1, -320, 0, 20), ["ZIndex"]=1000, ["BackgroundTransparency"]=1, ["Size"]=UDim2.new(0, 300, 1, -40)}},
+    {40, "UIListLayout", 39, {["SortOrder"]=Enum.SortOrder.LayoutOrder, ["HorizontalAlignment"]=Enum.HorizontalAlignment.Right, ["Padding"]=UDim.new(0, 10)}},
+    {42, "TextButton", 22, {["Size"]=UDim2.new(0.9, 0, 0, 35), ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=0.3, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Text"]="Inicio", ["TextSize"]=13, ["BackgroundColor3"]=Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803)}},
+    {43, "UICorner", 42, {["CornerRadius"]=UDim.new(0, 6)}},
+    {44, "ImageLabel", 42, {["ImageColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961), ["Image"]="rbxassetid://10814531047", ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.05, 0, 0.2, 0), ["Size"]=UDim2.new(0, 20, 0, 20)}},
+    {45, "TextButton", 22, {["Size"]=UDim2.new(0.9, 0, 0, 35), ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=0.3, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Text"]="Combate", ["TextSize"]=13, ["BackgroundColor3"]=Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803)}},
+    {46, "UICorner", 45, {["CornerRadius"]=UDim.new(0, 6)}},
+    {47, "ImageLabel", 45, {["ImageColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961), ["Image"]="rbxassetid://16029076040", ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.05, 0, 0.2, 0), ["Size"]=UDim2.new(0, 20, 0, 20)}},
+    {48, "TextButton", 22, {["Size"]=UDim2.new(0.9, 0, 0, 35), ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=0.3, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Text"]="Aimbots", ["TextSize"]=13, ["BackgroundColor3"]=Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803)}},
+    {49, "UICorner", 48, {["CornerRadius"]=UDim.new(0, 6)}},
+    {50, "ImageLabel", 48, {["ImageColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961), ["Image"]="rbxassetid://13557340523", ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.05, 0, 0.2, 0), ["Size"]=UDim2.new(0, 20, 0, 20)}},
+    {51, "TextButton", 22, {["Size"]=UDim2.new(0.9, 0, 0, 35), ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=0.3, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Text"]="Visual", ["TextSize"]=13, ["BackgroundColor3"]=Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803)}},
+    {52, "UICorner", 51, {["CornerRadius"]=UDim.new(0, 6)}},
+    {53, "ImageLabel", 51, {["ImageColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961), ["Image"]="rbxassetid://121658694000474", ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.05, 0, 0.2, 0), ["Size"]=UDim2.new(0, 20, 0, 20)}},
+    {54, "TextButton", 22, {["Size"]=UDim2.new(0.9, 0, 0, 35), ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=0.3, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Text"]="Teleporte", ["TextSize"]=13, ["BackgroundColor3"]=Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803)}},
+    {55, "UICorner", 54, {["CornerRadius"]=UDim.new(0, 6)}},
+    {56, "ImageLabel", 54, {["ImageColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961), ["Image"]="rbxassetid://6023426915", ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.05, 0, 0.2, 0), ["Size"]=UDim2.new(0, 20, 0, 20)}},
+    {57, "TextButton", 22, {["Size"]=UDim2.new(0.9, 0, 0, 35), ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=0.3, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Text"]="Outros", ["TextSize"]=13, ["BackgroundColor3"]=Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803)}},
+    {58, "UICorner", 57, {["CornerRadius"]=UDim.new(0, 6)}},
+    {59, "ImageLabel", 57, {["ImageColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961), ["Image"]="rbxassetid://6023426915", ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.05, 0, 0.2, 0), ["Size"]=UDim2.new(0, 20, 0, 20)}},
+    {60, "Frame", 36, {["Visible"]=false, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 40), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {61, "UICorner", 60, {["CornerRadius"]=UDim.new(0, 8)}},
+    {62, "TextLabel", 60, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="Bem-vindo", ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 1, 0)}},
+    {63, "TextButton", 60, {["Size"]=UDim2.new(0, 45, 0, 22), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(1, 1, 1), ["Position"]=UDim2.new(0.82, 0, 0.15, 0), ["Text"]="OFF", ["TextSize"]=11, ["BackgroundColor3"]=Color3.new(0.7843137254901961, 0.23529411764705882, 0.23529411764705882)}},
+    {64, "UICorner", 63, {["CornerRadius"]=UDim.new(0, 10)}},
+    {65, "Frame", 36, {["Visible"]=false, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 40), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {66, "UICorner", 65, {["CornerRadius"]=UDim.new(0, 8)}},
+    {67, "TextLabel", 65, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="Mostrar Notificações", ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 1, 0)}},
+    {68, "TextButton", 65, {["Size"]=UDim2.new(0, 45, 0, 22), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(1, 1, 1), ["Position"]=UDim2.new(0.82, 0, 0.15, 0), ["Text"]="OFF", ["TextSize"]=11, ["BackgroundColor3"]=Color3.new(0.7843137254901961, 0.23529411764705882, 0.23529411764705882)}},
+    {69, "UICorner", 68, {["CornerRadius"]=UDim.new(0, 10)}},
+    {70, "Frame", 36, {["Visible"]=false, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 40), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {71, "UICorner", 70, {["CornerRadius"]=UDim.new(0, 8)}},
+    {72, "TextLabel", 70, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="Nitro Automático", ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 1, 0)}},
+    {73, "TextButton", 70, {["Size"]=UDim2.new(0, 45, 0, 22), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(1, 1, 1), ["Position"]=UDim2.new(0.82, 0, 0.15, 0), ["Text"]="OFF", ["TextSize"]=11, ["BackgroundColor3"]=Color3.new(0.7843137254901961, 0.23529411764705882, 0.23529411764705882)}},
+    {74, "UICorner", 73, {["CornerRadius"]=UDim.new(0, 10)}},
+    {75, "Frame", 36, {["Visible"]=false, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 70), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {76, "UICorner", 75, {["CornerRadius"]=UDim.new(0, 8)}},
+    {77, "TextLabel", 75, {["TextColor3"]=Color3.new(0, 0, 0), ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 5), ["Text"]="Força do Nitro", ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 0, 20)}},
+    {78, "TextLabel", 75, {["TextColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961), ["Font"]=Enum.Font.GothamBold, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.75, 0, 0, 5), ["Text"]="20", ["TextSize"]=14, ["Size"]=UDim2.new(0.22, 0, 0, 20)}},
+    {79, "Frame", 75, {["Size"]=UDim2.new(0.9, 0, 0, 6), ["Position"]=UDim2.new(0.05, 0, 0.5, 0), ["BackgroundColor3"]=Color3.new(0.8627450980392157, 0.8627450980392157, 0.8823529411764706)}},
+    {80, "UICorner", 79, {["CornerRadius"]=UDim.new(1, 0)}},
+    {81, "Frame", 79, {["Size"]=UDim2.new(0, 0, 1, 0), ["BackgroundColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961)}},
+    {82, "UICorner", 81, {["CornerRadius"]=UDim.new(1, 0)}},
+    {83, "TextButton", 79, {["Position"]=UDim2.new(0, -6, 0.5, -6), ["Text"]="", ["Size"]=UDim2.new(0, 12, 0, 12), ["BackgroundColor3"]=Color3.new(1, 1, 1)}},
+    {84, "UICorner", 83, {["CornerRadius"]=UDim.new(1, 0)}},
+    {85, "Frame", 36, {["Visible"]=false, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 40), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {86, "UICorner", 85, {["CornerRadius"]=UDim.new(0, 8)}},
+    {87, "TextLabel", 85, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="Munição Infinita Unificada", ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 1, 0)}},
+    {88, "TextButton", 85, {["Size"]=UDim2.new(0, 45, 0, 22), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(1, 1, 1), ["Position"]=UDim2.new(0.82, 0, 0.15, 0), ["Text"]="OFF", ["TextSize"]=11, ["BackgroundColor3"]=Color3.new(0.7843137254901961, 0.23529411764705882, 0.23529411764705882)}},
+    {89, "UICorner", 88, {["CornerRadius"]=UDim.new(0, 10)}},
+    {90, "Frame", 36, {["Visible"]=false, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 40), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {91, "UICorner", 90, {["CornerRadius"]=UDim.new(0, 8)}},
+    {92, "TextLabel", 90, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="Hitbox Expansor", ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 1, 0)}},
+    {93, "TextButton", 90, {["Size"]=UDim2.new(0, 45, 0, 22), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(1, 1, 1), ["Position"]=UDim2.new(0.82, 0, 0.15, 0), ["Text"]="OFF", ["TextSize"]=11, ["BackgroundColor3"]=Color3.new(0.7843137254901961, 0.23529411764705882, 0.23529411764705882)}},
+    {94, "UICorner", 93, {["CornerRadius"]=UDim.new(0, 10)}},
+    {95, "Frame", 36, {["Visible"]=false, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 70), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {96, "UICorner", 95, {["CornerRadius"]=UDim.new(0, 8)}},
+    {97, "TextLabel", 95, {["TextColor3"]=Color3.new(0, 0, 0), ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 5), ["Text"]="Tamanho do Hitbox", ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 0, 20)}},
+    {98, "TextLabel", 95, {["TextColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961), ["Font"]=Enum.Font.GothamBold, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.75, 0, 0, 5), ["Text"]="5", ["TextSize"]=14, ["Size"]=UDim2.new(0.22, 0, 0, 20)}},
+    {99, "Frame", 95, {["Size"]=UDim2.new(0.9, 0, 0, 6), ["Position"]=UDim2.new(0.05, 0, 0.5, 0), ["BackgroundColor3"]=Color3.new(0.8627450980392157, 0.8627450980392157, 0.8823529411764706)}},
+    {100, "UICorner", 99, {["CornerRadius"]=UDim.new(1, 0)}},
+    {101, "Frame", 99, {["Size"]=UDim2.new(0, 0, 1, 0), ["BackgroundColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961)}},
+    {102, "UICorner", 101, {["CornerRadius"]=UDim.new(1, 0)}},
+    {103, "TextButton", 99, {["Position"]=UDim2.new(0, -6, 0.5, -6), ["Text"]="", ["Size"]=UDim2.new(0, 12, 0, 12), ["BackgroundColor3"]=Color3.new(1, 1, 1)}},
+    {104, "UICorner", 103, {["CornerRadius"]=UDim.new(1, 0)}},
+    {105, "Frame", 36, {["Visible"]=false, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 40), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {106, "UICorner", 105, {["CornerRadius"]=UDim.new(0, 8)}},
+    {107, "TextLabel", 105, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="Aimbot Ativo", ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 1, 0)}},
+    {108, "TextButton", 105, {["Size"]=UDim2.new(0, 45, 0, 22), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(1, 1, 1), ["Position"]=UDim2.new(0.82, 0, 0.15, 0), ["Text"]="OFF", ["TextSize"]=11, ["BackgroundColor3"]=Color3.new(0.7843137254901961, 0.23529411764705882, 0.23529411764705882)}},
+    {109, "UICorner", 108, {["CornerRadius"]=UDim.new(0, 10)}},
+    {110, "Frame", 36, {["Visible"]=false, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 40), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {111, "UICorner", 110, {["CornerRadius"]=UDim.new(0, 8)}},
+    {112, "TextLabel", 110, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="Team Check", ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 1, 0)}},
+    {113, "TextButton", 110, {["Size"]=UDim2.new(0, 45, 0, 22), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(1, 1, 1), ["Position"]=UDim2.new(0.82, 0, 0.15, 0), ["Text"]="OFF", ["TextSize"]=11, ["BackgroundColor3"]=Color3.new(0.7843137254901961, 0.23529411764705882, 0.23529411764705882)}},
+    {114, "UICorner", 113, {["CornerRadius"]=UDim.new(0, 10)}},
+    {115, "Frame", 36, {["Visible"]=false, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 40), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {116, "UICorner", 115, {["CornerRadius"]=UDim.new(0, 8)}},
+    {117, "TextLabel", 115, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="Trocar Parte", ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 1, 0)}},
+    {118, "TextButton", 115, {["Size"]=UDim2.new(0, 45, 0, 22), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(1, 1, 1), ["Position"]=UDim2.new(0.82, 0, 0.15, 0), ["Text"]="OFF", ["TextSize"]=11, ["BackgroundColor3"]=Color3.new(0.7843137254901961, 0.23529411764705882, 0.23529411764705882)}},
+    {119, "UICorner", 118, {["CornerRadius"]=UDim.new(0, 10)}},
+    {120, "Frame", 36, {["Visible"]=false, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 70), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {121, "UICorner", 120, {["CornerRadius"]=UDim.new(0, 8)}},
+    {122, "TextLabel", 120, {["TextColor3"]=Color3.new(0, 0, 0), ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 5), ["Text"]="FOV", ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 0, 20)}},
+    {123, "TextLabel", 120, {["TextColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961), ["Font"]=Enum.Font.GothamBold, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.75, 0, 0, 5), ["Text"]="10", ["TextSize"]=14, ["Size"]=UDim2.new(0.22, 0, 0, 20)}},
+    {124, "Frame", 120, {["Size"]=UDim2.new(0.9, 0, 0, 6), ["Position"]=UDim2.new(0.05, 0, 0.5, 0), ["BackgroundColor3"]=Color3.new(0.8627450980392157, 0.8627450980392157, 0.8823529411764706)}},
+    {125, "UICorner", 124, {["CornerRadius"]=UDim.new(1, 0)}},
+    {126, "Frame", 124, {["Size"]=UDim2.new(0, 0, 1, 0), ["BackgroundColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961)}},
+    {127, "UICorner", 126, {["CornerRadius"]=UDim.new(1, 0)}},
+    {128, "TextButton", 124, {["Position"]=UDim2.new(0, -6, 0.5, -6), ["Text"]="", ["Size"]=UDim2.new(0, 12, 0, 12), ["BackgroundColor3"]=Color3.new(1, 1, 1)}},
+    {129, "UICorner", 128, {["CornerRadius"]=UDim.new(1, 0)}},
+    {130, "Frame", 36, {["Visible"]=false, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 40), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {131, "UICorner", 130, {["CornerRadius"]=UDim.new(0, 8)}},
+    {132, "TextLabel", 130, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="ESP Box com Vida", ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 1, 0)}},
+    {133, "TextButton", 130, {["Size"]=UDim2.new(0, 45, 0, 22), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(1, 1, 1), ["Position"]=UDim2.new(0.82, 0, 0.15, 0), ["Text"]="OFF", ["TextSize"]=11, ["BackgroundColor3"]=Color3.new(0.7843137254901961, 0.23529411764705882, 0.23529411764705882)}},
+    {134, "UICorner", 133, {["CornerRadius"]=UDim.new(0, 10)}},
+    {135, "Frame", 36, {["Visible"]=false, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 40), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {136, "UICorner", 135, {["CornerRadius"]=UDim.new(0, 8)}},
+    {137, "TextLabel", 135, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="ESP Tracer", ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 1, 0)}},
+    {138, "TextButton", 135, {["Size"]=UDim2.new(0, 45, 0, 22), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(1, 1, 1), ["Position"]=UDim2.new(0.82, 0, 0.15, 0), ["Text"]="OFF", ["TextSize"]=11, ["BackgroundColor3"]=Color3.new(0.7843137254901961, 0.23529411764705882, 0.23529411764705882)}},
+    {139, "UICorner", 138, {["CornerRadius"]=UDim.new(0, 10)}},
+    {140, "Frame", 36, {["Visible"]=false, ["BackgroundTransparency"]=0.2, ["ClipsDescendants"]=true, ["Size"]=UDim2.new(0.95, 0, 0, 50), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {141, "UICorner", 140, {["CornerRadius"]=UDim.new(0, 8)}},
+    {142, "TextLabel", 140, {["TextColor3"]=Color3.new(0, 0, 0), ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 5), ["Text"]="Locais de Teleporte", ["TextSize"]=14, ["Size"]=UDim2.new(0.6, 0, 0, 35)}},
+    {143, "TextButton", 140, {["Size"]=UDim2.new(0.4, 0, 0, 30), ["Font"]=Enum.Font.Gotham, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Position"]=UDim2.new(0.55, 0, 0.15, 0), ["Text"]="Praça", ["TextSize"]=12, ["BackgroundColor3"]=Color3.new(0.8627450980392157, 0.8627450980392157, 0.8823529411764706)}},
+    {144, "UICorner", 143, {["CornerRadius"]=UDim.new(0, 6)}},
+    {145, "TextButton", 140, {["Visible"]=false, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Text"]="Praça", ["Font"]=Enum.Font.Gotham, ["Position"]=UDim2.new(0.55, 0, 0, 50), ["Size"]=UDim2.new(0.4, 0, 0, 30), ["TextSize"]=12, ["BackgroundColor3"]=Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803)}},
+    {146, "UICorner", 145, {["CornerRadius"]=UDim.new(0, 6)}},
+    {147, "TextButton", 140, {["Visible"]=false, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Text"]="Venda de Carros", ["Font"]=Enum.Font.Gotham, ["Position"]=UDim2.new(0.55, 0, 0, 85), ["Size"]=UDim2.new(0.4, 0, 0, 30), ["TextSize"]=12, ["BackgroundColor3"]=Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803)}},
+    {148, "UICorner", 147, {["CornerRadius"]=UDim.new(0, 6)}},
+    {149, "TextButton", 140, {["Visible"]=false, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Text"]="Garagem", ["Font"]=Enum.Font.Gotham, ["Position"]=UDim2.new(0.55, 0, 0, 120), ["Size"]=UDim2.new(0.4, 0, 0, 30), ["TextSize"]=12, ["BackgroundColor3"]=Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803)}},
+    {150, "UICorner", 149, {["CornerRadius"]=UDim.new(0, 6)}},
+    {151, "TextButton", 140, {["Visible"]=false, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Text"]="Ilegal de Rua", ["Font"]=Enum.Font.Gotham, ["Position"]=UDim2.new(0.55, 0, 0, 155), ["Size"]=UDim2.new(0.4, 0, 0, 30), ["TextSize"]=12, ["BackgroundColor3"]=Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803)}},
+    {152, "UICorner", 151, {["CornerRadius"]=UDim.new(0, 6)}},
+    {153, "TextButton", 140, {["Visible"]=false, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Text"]="Mecânica", ["Font"]=Enum.Font.Gotham, ["Position"]=UDim2.new(0.55, 0, 0, 190), ["Size"]=UDim2.new(0.4, 0, 0, 30), ["TextSize"]=12, ["BackgroundColor3"]=Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803)}},
+    {154, "UICorner", 153, {["CornerRadius"]=UDim.new(0, 6)}},
+    {155, "TextButton", 140, {["Visible"]=false, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Text"]="Mercadinho", ["Font"]=Enum.Font.Gotham, ["Position"]=UDim2.new(0.55, 0, 0, 225), ["Size"]=UDim2.new(0.4, 0, 0, 30), ["TextSize"]=12, ["BackgroundColor3"]=Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803)}},
+    {156, "UICorner", 155, {["CornerRadius"]=UDim.new(0, 6)}},
+    {157, "TextButton", 140, {["Visible"]=false, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Text"]="Banco", ["Font"]=Enum.Font.Gotham, ["Position"]=UDim2.new(0.55, 0, 0, 260), ["Size"]=UDim2.new(0.4, 0, 0, 30), ["TextSize"]=12, ["BackgroundColor3"]=Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803)}},
+    {158, "UICorner", 157, {["CornerRadius"]=UDim.new(0, 6)}},
+    {159, "TextButton", 140, {["Visible"]=false, ["TextColor3"]=Color3.new(0.23529411764705882, 0.23529411764705882, 0.27450980392156865), ["Text"]="Prefeitura", ["Font"]=Enum.Font.Gotham, ["Position"]=UDim2.new(0.55, 0, 0, 295), ["Size"]=UDim2.new(0.4, 0, 0, 30), ["TextSize"]=12, ["BackgroundColor3"]=Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803)}},
+    {160, "UICorner", 159, {["CornerRadius"]=UDim.new(0, 6)}},
+    {161, "Frame", 36, {["Visible"]=true, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 40), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {162, "UICorner", 161, {["CornerRadius"]=UDim.new(0, 8)}},
+    {163, "TextLabel", 161, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="Auto Click Farm", ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 1, 0)}},
+    {164, "TextButton", 161, {["Size"]=UDim2.new(0, 45, 0, 22), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(1, 1, 1), ["Position"]=UDim2.new(0.82, 0, 0.15, 0), ["Text"]="OFF", ["TextSize"]=11, ["BackgroundColor3"]=Color3.new(0.7843137254901961, 0.23529411764705882, 0.23529411764705882)}},
+    {165, "UICorner", 164, {["CornerRadius"]=UDim.new(0, 10)}},
+    {166, "Frame", 36, {["Visible"]=true, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 40), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {167, "UICorner", 166, {["CornerRadius"]=UDim.new(0, 8)}},
+    {168, "TextLabel", 166, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="Auto Reviver", ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 1, 0)}},
+    {169, "TextButton", 166, {["Size"]=UDim2.new(0, 45, 0, 22), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(1, 1, 1), ["Position"]=UDim2.new(0.82, 0, 0.15, 0), ["Text"]="OFF", ["TextSize"]=11, ["BackgroundColor3"]=Color3.new(0.7843137254901961, 0.23529411764705882, 0.23529411764705882)}},
+    {170, "UICorner", 169, {["CornerRadius"]=UDim.new(0, 10)}},
+    {171, "Frame", 36, {["Visible"]=true, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 40), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {172, "UICorner", 171, {["CornerRadius"]=UDim.new(0, 8)}},
+    {173, "TextLabel", 171, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="Fly Orpheus V4.2", ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 1, 0)}},
+    {174, "TextButton", 171, {["Size"]=UDim2.new(0, 45, 0, 22), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(1, 1, 1), ["Position"]=UDim2.new(0.82, 0, 0.15, 0), ["Text"]="OFF", ["TextSize"]=11, ["BackgroundColor3"]=Color3.new(0.7843137254901961, 0.23529411764705882, 0.23529411764705882)}},
+    {175, "UICorner", 174, {["CornerRadius"]=UDim.new(0, 10)}},
+    {176, "Frame", 36, {["Visible"]=true, ["BackgroundTransparency"]=0.2, ["Size"]=UDim2.new(0.95, 0, 0, 40), ["BackgroundColor3"]=Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)}},
+    {177, "UICorner", 176, {["CornerRadius"]=UDim.new(0, 8)}},
+    {178, "TextLabel", 176, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="Auto Destrancar Carro", ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0.03, 0, 0, 0), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextSize"]=14, ["Size"]=UDim2.new(0.7, 0, 1, 0)}},
+    {179, "TextButton", 176, {["Size"]=UDim2.new(0, 45, 0, 22), ["Font"]=Enum.Font.GothamBold, ["TextColor3"]=Color3.new(1, 1, 1), ["Position"]=UDim2.new(0.82, 0, 0.15, 0), ["Text"]="OFF", ["TextSize"]=11, ["BackgroundColor3"]=Color3.new(0.7843137254901961, 0.23529411764705882, 0.23529411764705882)}},
+    {180, "UICorner", 179, {["CornerRadius"]=UDim.new(0, 10)}},
+    {181, "Frame", 39, {["Size"]=UDim2.new(1, 0, 0, 90), ["Position"]=UDim2.new(1, 0, 0, 0), ["ClipsDescendants"]=true, ["ZIndex"]=1000, ["BorderSizePixel"]=0, ["BackgroundColor3"]=Color3.new(1, 1, 1)}},
+    {182, "UICorner", 181, {["CornerRadius"]=UDim.new(0, 10)}},
+    {183, "UIGradient", 181, {["Rotation"]=45, ["Color"]=ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(0.9411764705882353, 0.9411764705882353, 0.9607843137254902)), ColorSequenceKeypoint.new(1, Color3.new(0.9019607843137255, 0.9019607843137255, 0.9215686274509803))})}},
+    {184, "Frame", 181, {["Size"]=UDim2.new(0, 5, 1, 0), ["ZIndex"]=1001, ["BorderSizePixel"]=0, ["BackgroundColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961)}},
+    {185, "UICorner", 184, {["CornerRadius"]=UDim.new(0, 10)}},
+    {186, "UIGradient", 184, {["Rotation"]=90, ["Color"]=ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.new(0, 0.39215686274509803, 0.7843137254901961)), ColorSequenceKeypoint.new(1, Color3.new(0, 0.5882352941176471, 1))})}},
+    {187, "Frame", 181, {["Position"]=UDim2.new(0, 15, 0, 12), ["ZIndex"]=1001, ["Size"]=UDim2.new(0, 40, 0, 40), ["BackgroundColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961)}},
+    {188, "UICorner", 187, {["CornerRadius"]=UDim.new(0, 8)}},
+    {189, "TextLabel", 187, {["ZIndex"]=1002, ["Font"]=Enum.Font.GothamBold, ["BackgroundTransparency"]=1, ["TextColor3"]=Color3.new(1, 1, 1), ["Text"]="🧊", ["TextSize"]=24, ["Size"]=UDim2.new(1, 0, 1, 0)}},
+    {190, "TextLabel", 181, {["TextColor3"]=Color3.new(0, 0, 0), ["Text"]="Ice Menu", ["Font"]=Enum.Font.GothamBold, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0, 65, 0, 12), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["ZIndex"]=1002, ["TextSize"]=15, ["Size"]=UDim2.new(1, -75, 0, 22)}},
+    {191, "TextLabel", 181, {["TextWrapped"]=true, ["TextColor3"]=Color3.new(0.3137254901960784, 0.3137254901960784, 0.35294117647058826), ["Text"]="GUI loaded successfully!", ["ZIndex"]=1002, ["Font"]=Enum.Font.Gotham, ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0, 65, 0, 38), ["TextXAlignment"]=Enum.TextXAlignment.Left, ["TextYAlignment"]=Enum.TextYAlignment.Top, ["TextSize"]=13, ["Size"]=UDim2.new(1, -75, 0, 40)}},
+    {192, "Frame", 181, {["Size"]=UDim2.new(0, 0, 0, 3), ["Position"]=UDim2.new(0, 10, 1, -4), ["ZIndex"]=1001, ["BorderSizePixel"]=0, ["BackgroundColor3"]=Color3.new(0, 0.39215686274509803, 0.7843137254901961)}},
+    {193, "UICorner", 192, {["CornerRadius"]=UDim.new(1, 0)}},
+    {194, "ScreenGui", playerGui, {["ResetOnSpawn"]=false, ["Name"]="IceMenuAutoClick"}},
+    {195, "Frame", 194, {["Position"]=UDim2.new(0.05, 0, 0.3, 0), ["Active"]=true, ["BackgroundColor3"]=Color3.new(0.0784313725490196, 0.0784313725490196, 0.0784313725490196), ["Size"]=UDim2.new(0, 160, 0, 140)}},
+    {196, "UIStroke", 195, {["Thickness"]=2, ["Color"]=Color3.new(0, 0.5490196078431373, 1)}},
+    {197, "TextLabel", 195, {["BackgroundTransparency"]=1, ["TextColor3"]=Color3.new(1, 1, 1), ["Text"]="Auto Click", ["TextScaled"]=true, ["Size"]=UDim2.new(1, 0, 0, 25)}},
+    {198, "TextLabel", 195, {["TextColor3"]=Color3.new(1, 0.23529411764705882, 0.23529411764705882), ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0, 0, 0.25, 0), ["Text"]="Status: OFF", ["TextScaled"]=true, ["Size"]=UDim2.new(1, 0, 0, 25)}},
+    {199, "TextButton", 195, {["TextColor3"]=Color3.new(1, 1, 1), ["BackgroundColor3"]=Color3.new(0.11764705882352941, 0.11764705882352941, 0.11764705882352941), ["Position"]=UDim2.new(0, 10, 0.5, 0), ["Text"]="Ativar", ["TextScaled"]=true, ["Size"]=UDim2.new(1, -20, 0, 28)}},
+    {200, "TextButton", 195, {["TextColor3"]=Color3.new(1, 1, 1), ["BackgroundColor3"]=Color3.new(0.11764705882352941, 0.11764705882352941, 0.11764705882352941), ["Position"]=UDim2.new(0, 10, 0.75, 0), ["Text"]="Trocar Local", ["TextScaled"]=true, ["Size"]=UDim2.new(1, -20, 0, 28)}},
+    {201, "ScreenGui", playerGui, {["ResetOnSpawn"]=false, ["Name"]="SafeCarGUI"}},
+    {202, "Frame", 201, {["BackgroundTransparency"]=0.1, ["Position"]=UDim2.new(0.5, -85, 0.75, -35), ["BackgroundColor3"]=Color3.new(0.0784313725490196, 0.0784313725490196, 0.0784313725490196), ["BorderSizePixel"]=0, ["Size"]=UDim2.new(0, 170, 0, 70)}},
+    {203, "UICorner", 202, {["CornerRadius"]=UDim.new(0, 12)}},
+    {204, "UIStroke", 202, {["Thickness"]=1, ["Color"]=Color3.new(0.35294117647058826, 0.35294117647058826, 0.35294117647058826)}},
+    {205, "TextButton", 202, {["TextColor3"]=Color3.new(1, 1, 1), ["BorderSizePixel"]=0, ["BackgroundColor3"]=Color3.new(0.13725490196078433, 0.13725490196078433, 0.13725490196078433), ["Position"]=UDim2.new(0, 10, 0, 15), ["Text"]="AUTO ENTRAR P1", ["TextScaled"]=true, ["Size"]=UDim2.new(1, -20, 0, 40)}},
+    {206, "UICorner", 205, {["CornerRadius"]=UDim.new(0, 10)}},
+    {207, "UIStroke", 205, {["Thickness"]=1}},
+    {208, "ScreenGui", playerGui, {["ResetOnSpawn"]=false, ["Name"]="OrpheusFlyV42", ["Enabled"]=true}},
+    {209, "TextButton", 208, {["TextColor3"]=Color3.new(0.9, 0.9, 0.9), ["Text"]="🛸 FLY OFF", ["AnchorPoint"]=Vector2.new(0, 1), ["Font"]=Enum.Font.GothamBold, ["Position"]=UDim2.new(0, 10, 1, -60), ["BorderSizePixel"]=0, ["BackgroundColor3"]=Color3.new(0.09803921568627451, 0.09803921568627451, 0.09803921568627451), ["TextSize"]=16, ["Size"]=UDim2.new(0, 120, 0, 45)}},
+    {210, "TextButton", 208, {["TextColor3"]=Color3.new(1, 1, 1), ["Text"]="▲", ["AnchorPoint"]=Vector2.new(1, 1), ["Font"]=Enum.Font.GothamBold, ["Position"]=UDim2.new(1, -155, 1, -155), ["BorderSizePixel"]=0, ["BackgroundColor3"]=Color3.new(0.13725490196078433, 0.13725490196078433, 0.13725490196078433), ["TextSize"]=22, ["Size"]=UDim2.new(0, 50, 0, 50)}},
+    {211, "UICorner", 210, {["CornerRadius"]=UDim.new(1, 0)}},
+    {212, "TextButton", 208, {["TextColor3"]=Color3.new(1, 1, 1), ["Text"]="▼", ["AnchorPoint"]=Vector2.new(1, 1), ["Font"]=Enum.Font.GothamBold, ["Position"]=UDim2.new(1, -75, 1, -85), ["BorderSizePixel"]=0, ["BackgroundColor3"]=Color3.new(0.13725490196078433, 0.13725490196078433, 0.13725490196078433), ["TextSize"]=22, ["Size"]=UDim2.new(0, 50, 0, 50)}},
+    {213, "UICorner", 212, {["CornerRadius"]=UDim.new(1, 0)}},
+    {221, "ScreenGui", playerGui, {["ResetOnSpawn"]=false, ["Name"]="AmmoInfUnifiedUI"}},
+    {222, "Frame", 221, {["Position"]=UDim2.new(0.05, 0, 0.3, 0), ["Active"]=true, ["BackgroundColor3"]=Color3.new(0.0784313725490196, 0.0784313725490196, 0.0784313725490196), ["Size"]=UDim2.new(0, 160, 0, 110)}},
+    {223, "UIStroke", 222, {["Thickness"]=2, ["Color"]=Color3.new(0, 0.5490196078431373, 1)}},
+    {224, "TextLabel", 222, {["TextColor3"]=Color3.new(1, 0.23529411764705882, 0.23529411764705882), ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0, 0, 0.25, 0), ["Text"]="Munição Infinita: OFF", ["TextScaled"]=true, ["Size"]=UDim2.new(1, 0, 0, 25)}},
+    {225, "TextButton", 222, {["TextColor3"]=Color3.new(1, 1, 1), ["BackgroundColor3"]=Color3.new(0.11764705882352941, 0.11764705882352941, 0.11764705882352941), ["Position"]=UDim2.new(0, 10, 0.55, 0), ["Text"]="Ativar", ["TextScaled"]=true, ["Size"]=UDim2.new(1, -20, 0, 32)}},
+    {226, "ScreenGui", playerGui, {["ResetOnSpawn"]=false, ["Name"]="AutoReviver_Delta"}},
+    {227, "Frame", 226, {["Position"]=UDim2.new(0.05, 0, 0.5, 0), ["Active"]=true, ["BackgroundColor3"]=Color3.new(0.0784313725490196, 0.0784313725490196, 0.0784313725490196), ["Size"]=UDim2.new(0, 160, 0, 140)}},
+    {228, "UIStroke", 227, {["Thickness"]=2, ["Color"]=Color3.new(0, 0.5490196078431373, 1)}},
+    {229, "TextLabel", 227, {["BackgroundTransparency"]=1, ["TextColor3"]=Color3.new(1, 1, 1), ["Text"]="Auto Reviver", ["TextScaled"]=true, ["Size"]=UDim2.new(1, 0, 0, 25)}},
+    {230, "TextLabel", 227, {["TextColor3"]=Color3.new(1, 0.23529411764705882, 0.23529411764705882), ["BackgroundTransparency"]=1, ["Position"]=UDim2.new(0, 0, 0.25, 0), ["Text"]="Status: OFF", ["TextScaled"]=true, ["Size"]=UDim2.new(1, 0, 0, 25)}},
+    {231, "TextButton", 227, {["TextColor3"]=Color3.new(1, 1, 1), ["BackgroundColor3"]=Color3.new(0.11764705882352941, 0.11764705882352941, 0.11764705882352941), ["Position"]=UDim2.new(0, 10, 0.5, 0), ["Text"]="Reviver Agora", ["TextScaled"]=true, ["Size"]=UDim2.new(1, -20, 0, 28)}},
+    {232, "TextButton", 227, {["TextColor3"]=Color3.new(1, 0.23529411764705882, 0.23529411764705882), ["BackgroundColor3"]=Color3.new(0.11764705882352941, 0.11764705882352941, 0.11764705882352941), ["Position"]=UDim2.new(0, 10, 0.75, 0), ["Text"]="Auto: OFF", ["TextScaled"]=true, ["Size"]=UDim2.new(1, -20, 0, 28)}},
+}
+
+for _, definition in ipairs(blueprint) do
+    item[definition[1]] = Instance.new(definition[2])
+end
+
+for _, definition in ipairs(blueprint) do
+    local obj = item[definition[1]]
+    for key, value in pairs(definition[4]) do
+        obj[key] = value
+    end
+    local parent = definition[3]
+    if type(parent) == "number" then
+        obj.Parent = assert(item[parent], "Pai ausente no blueprint: " .. tostring(parent))
+    else
+        obj.Parent = parent
+    end
+end
+
+local mobile = UserInputService.TouchEnabled
+if mobile then
+    item[18].Size = UDim2.new(0, 600, 0, 400)
+    item[22].Size = UDim2.new(0, 120, 0, 272)
+    item[22].CanvasSize = UDim2.new(0, 0, 0, 198)
+    item[25].Size = UDim2.new(0, 120, 0, 64)
+    item[27].Size = UDim2.new(0, 40, 0, 40)
+    item[28].Size = UDim2.new(1, 0, 0, 20)
+    item[29].Size = UDim2.new(0, 480, 0, 48)
+    item[31].Size = UDim2.new(0, 120, 0, 32)
+    item[32].Size = UDim2.new(0, 24, 0, 24)
+    item[34].Size = UDim2.new(0, 24, 0, 24)
+    item[36].CanvasSize = UDim2.new(0, 0, 0, 1052)
+    item[36].Size = UDim2.new(0, 480, 0, 296)
+    item[42].Size = UDim2.new(0.9, 0, 0, 28)
+    item[42].TextSize = 15
+    item[44].Size = UDim2.new(0, 16, 0, 16)
+    item[45].Size = UDim2.new(0.9, 0, 0, 28)
+    item[45].TextSize = 15
+    item[47].Size = UDim2.new(0, 16, 0, 16)
+    item[48].Size = UDim2.new(0.9, 0, 0, 28)
+    item[48].TextSize = 15
+    item[50].Size = UDim2.new(0, 16, 0, 16)
+    item[51].Size = UDim2.new(0.9, 0, 0, 28)
+    item[51].TextSize = 15
+    item[53].Size = UDim2.new(0, 16, 0, 16)
+    item[54].Size = UDim2.new(0.9, 0, 0, 28)
+    item[54].TextSize = 15
+    item[56].Size = UDim2.new(0, 16, 0, 16)
+    item[57].Size = UDim2.new(0.9, 0, 0, 28)
+    item[57].TextSize = 15
+    item[59].Size = UDim2.new(0, 16, 0, 16)
+    item[60].Size = UDim2.new(0.95, 0, 0, 50)
+    item[62].TextSize = 16
+    item[63].Size = UDim2.new(0, 36, 0, 17.6)
+    item[65].Size = UDim2.new(0.95, 0, 0, 50)
+    item[67].TextSize = 16
+    item[68].Size = UDim2.new(0, 36, 0, 17.6)
+    item[70].Size = UDim2.new(0.95, 0, 0, 50)
+    item[72].TextSize = 16
+    item[73].Size = UDim2.new(0, 36, 0, 17.6)
+    item[75].Size = UDim2.new(0.95, 0, 0, 56)
+    item[77].TextSize = 16
+    item[78].TextSize = 16
+    item[83].Size = UDim2.new(0, 9.600000000000001, 0, 9.600000000000001)
+    item[85].Size = UDim2.new(0.95, 0, 0, 50)
+    item[87].TextSize = 16
+    item[88].Size = UDim2.new(0, 36, 0, 17.6)
+    item[90].Size = UDim2.new(0.95, 0, 0, 50)
+    item[92].TextSize = 16
+    item[93].Size = UDim2.new(0, 36, 0, 17.6)
+    item[95].Size = UDim2.new(0.95, 0, 0, 56)
+    item[97].TextSize = 16
+    item[98].TextSize = 16
+    item[103].Size = UDim2.new(0, 9.600000000000001, 0, 9.600000000000001)
+    item[105].Size = UDim2.new(0.95, 0, 0, 50)
+    item[107].TextSize = 16
+    item[108].Size = UDim2.new(0, 36, 0, 17.6)
+    item[110].Size = UDim2.new(0.95, 0, 0, 50)
+    item[112].TextSize = 16
+    item[113].Size = UDim2.new(0, 36, 0, 17.6)
+    item[115].Size = UDim2.new(0.95, 0, 0, 50)
+    item[117].TextSize = 16
+    item[118].Size = UDim2.new(0, 36, 0, 17.6)
+    item[120].Size = UDim2.new(0.95, 0, 0, 56)
+    item[122].TextSize = 16
+    item[123].TextSize = 16
+    item[128].Size = UDim2.new(0, 9.600000000000001, 0, 9.600000000000001)
+    item[130].Size = UDim2.new(0.95, 0, 0, 50)
+    item[132].TextSize = 16
+    item[133].Size = UDim2.new(0, 36, 0, 17.6)
+    item[135].Size = UDim2.new(0.95, 0, 0, 50)
+    item[137].TextSize = 16
+    item[138].Size = UDim2.new(0, 36, 0, 17.6)
+    item[140].Size = UDim2.new(0.95, 0, 0, 40)
+    item[142].TextSize = 16
+    item[143].Size = UDim2.new(0.4, 0, 0, 24)
+    item[145].Size = UDim2.new(0.4, 0, 0, 24)
+    item[147].Position = UDim2.new(0.55, 0, 0, 78)
+    item[147].Size = UDim2.new(0.4, 0, 0, 24)
+    item[149].Position = UDim2.new(0.55, 0, 0, 106)
+    item[149].Size = UDim2.new(0.4, 0, 0, 24)
+    item[151].Position = UDim2.new(0.55, 0, 0, 134)
+    item[151].Size = UDim2.new(0.4, 0, 0, 24)
+    item[153].Position = UDim2.new(0.55, 0, 0, 162)
+    item[153].Size = UDim2.new(0.4, 0, 0, 24)
+    item[155].Position = UDim2.new(0.55, 0, 0, 190)
+    item[155].Size = UDim2.new(0.4, 0, 0, 24)
+    item[157].Position = UDim2.new(0.55, 0, 0, 218)
+    item[157].Size = UDim2.new(0.4, 0, 0, 24)
+    item[159].Position = UDim2.new(0.55, 0, 0, 246)
+    item[159].Size = UDim2.new(0.4, 0, 0, 24)
+    item[161].Size = UDim2.new(0.95, 0, 0, 50)
+    item[163].TextSize = 16
+    item[164].Size = UDim2.new(0, 36, 0, 17.6)
+    item[166].Size = UDim2.new(0.95, 0, 0, 50)
+    item[168].TextSize = 16
+    item[169].Size = UDim2.new(0, 36, 0, 17.6)
+    item[171].Size = UDim2.new(0.95, 0, 0, 50)
+    item[173].TextSize = 16
+    item[174].Size = UDim2.new(0, 36, 0, 17.6)
+    item[176].Size = UDim2.new(0.95, 0, 0, 50)
+    item[178].TextSize = 16
+    item[179].Size = UDim2.new(0, 36, 0, 17.6)
+end
+
+local guiIds = {17, 194, 201, 208, 221, 226}
+local connections = {}
+local closed = false
+
+local function connect(signal, callback)
+    local connection = signal:Connect(function(...)
+        if not closed then
+            callback(...)
+        end
+    end)
+    connections[#connections + 1] = connection
+    return connection
+end
+
+local function fechar(origin)
+    if closed then
+        return
+    end
+    closed = true
+    for _, connection in ipairs(connections) do
+        connection:Disconnect()
+    end
+    table.clear(connections)
+    for _, id in ipairs(guiIds) do
+        local gui = item[id]
+        if gui and gui ~= origin then
+            gui:Destroy()
+        end
+    end
+end
+
+connect(item[17].Destroying, function()
+    fechar(item[17])
+end)
+
+local function emit(event, ...)
+    if closed then
+        return
+    end
+    local fn = callbacks[event]
+    if type(fn) == "function" then
+        fn(...)
+    end
+end
+
+local grupos = {
+    Inicio = {60, 65},
+    Combate = {70, 75, 85, 90, 95},
+    Aimbots = {105, 110, 115, 120},
+    Visual = {130, 135},
+    Teleporte = {140},
+    Outros = {161, 166, 171, 176},
+}
+local abas = {42, 45, 48, 51, 54, 57}
+
+local function atualizarCanvas(resetScroll)
+    if closed then
+        return
+    end
+    local height = 8
+    for _, row in ipairs(item[36]:GetChildren()) do
+        if row:IsA("Frame") and row.Visible then
+            height += row.Size.Y.Offset + 8
+        end
+    end
+    item[36].CanvasSize = UDim2.new(0, 0, 0, height)
+    local maxY = math.max(0, height - item[36].AbsoluteSize.Y)
+    local y = resetScroll and 0 or math.clamp(item[36].CanvasPosition.Y, 0, maxY)
+    item[36].CanvasPosition = Vector2.new(0, y)
+end
+
+local function mudarAba(nome)
+    if closed or not grupos[nome] then
+        return false
+    end
+    for grupo, ids in pairs(grupos) do
+        for order, id in ipairs(ids) do
+            item[id].Visible = grupo == nome
+            item[id].LayoutOrder = order
+        end
+    end
+    item[31].Text = nome
+    atualizarCanvas(true)
+    return true
+end
+
+for order, id in ipairs(abas) do
+    item[id].LayoutOrder = order
+    connect(item[id].Activated, function()
+        mudarAba(item[id].Text)
+    end)
+end
+
+item[34].Name = "FecharTudo"
+item[34].Text = "🐻"
+item[34].TextSize = mobile and 18 or 22
+item[34].TextColor3 = Color3.new(1, 1, 1)
+item[34].AutoButtonColor = true
+item[34].AnchorPoint = Vector2.new(1, 0)
+item[32].AnchorPoint = Vector2.new(1, 0)
+
+local mainSize = mobile and UDim2.new(0, 600, 0, 400) or UDim2.new(0, 750, 0, 500)
+local smallSize = mobile and UDim2.new(0, 160, 0, 32) or UDim2.new(0, 200, 0, 40)
+local minimized = false
+
+local function atualizarJanela()
+    item[18].Size = minimized and smallSize or mainSize
+    local sidebar = minimized and 0 or (mobile and 120 or 150)
+    local height = minimized and smallSize.Y.Offset or (mobile and 48 or 60)
+    item[29].Position = UDim2.new(0, sidebar, 0, 0)
+    item[29].Size = UDim2.new(1, -sidebar, 0, height)
+    item[31].Position = UDim2.new(0, 12, 0, 0)
+    item[31].Size = UDim2.new(1, -100, 1, 0)
+    item[31].TextTruncate = Enum.TextTruncate.AtEnd
+    item[32].Position = UDim2.new(1, -48, 0, (height - item[32].Size.Y.Offset) / 2)
+    item[34].Position = UDim2.new(1, -10, 0, (height - item[34].Size.Y.Offset) / 2)
+    item[32].Text = minimized and "+" or "-"
+    for _, id in ipairs({22, 25, 36}) do
+        item[id].Visible = not minimized
+    end
+end
+
+connect(item[32].Activated, function()
+    minimized = not minimized
+    atualizarJanela()
+end)
+connect(item[34].Activated, function()
+    fechar()
+end)
+
+local function pointerBegan(input)
+    return input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch
+end
+
+local function pointerMoved(input, active)
+    if not active then
+        return false
+    end
+    return input == active or (
+        active.UserInputType == Enum.UserInputType.MouseButton1
+        and input.UserInputType == Enum.UserInputType.MouseMovement
+    )
+end
+
+local function pointerEnded(input, active)
+    return active and (input == active or (
+        active.UserInputType == Enum.UserInputType.MouseButton1
+        and input.UserInputType == Enum.UserInputType.MouseButton1
+    ))
+end
+
+local function arrastar(barra, alvo)
+    local active, starting, previous
+    barra.Active = true
+    connect(barra.InputBegan, function(input)
+        if not active and pointerBegan(input) then
+            active = input
+            starting = input.Position
+            previous = alvo.Position
+        end
+    end)
+    connect(UserInputService.InputChanged, function(input)
+        if pointerMoved(input, active) then
+            local dx = input.Position.X - starting.X
+            local dy = input.Position.Y - starting.Y
+            alvo.Position = UDim2.new(previous.X.Scale, previous.X.Offset + dx, previous.Y.Scale, previous.Y.Offset + dy)
+        end
+    end)
+    connect(UserInputService.InputEnded, function(input)
+        if pointerEnded(input, active) then
+            active, starting, previous = nil, nil, nil
+        end
+    end)
+end
+
+arrastar(item[29], item[18])
+arrastar(item[197], item[195])
+arrastar(item[202], item[202])
+arrastar(item[224], item[222])
+arrastar(item[229], item[227])
+
+local switches = {63, 68, 73, 88, 93, 108, 113, 118, 133, 138, 164, 169, 174, 179}
+for _, id in ipairs(switches) do
+    local button = item[id]
+    local label = button.Parent:FindFirstChildWhichIsA("TextLabel")
+    local enabled = false
+    connect(button.Activated, function()
+        enabled = not enabled
+        button.Text = enabled and "ON" or "OFF"
+        button.BackgroundColor3 = enabled and Color3.fromRGB(0, 180, 0) or Color3.fromRGB(200, 60, 60)
+        emit("toggle", label and label.Text or tostring(id), enabled)
+    end)
+end
+
+local sliders = {
+    {bar = 79, fill = 81, handle = 83, label = 78, name = "Força do Nitro", min = 20, max = 150},
+    {bar = 99, fill = 101, handle = 103, label = 98, name = "Tamanho do Hitbox", min = 5, max = 50},
+    {bar = 124, fill = 126, handle = 128, label = 123, name = "FOV", min = 10, max = 500},
+}
+for _, s in ipairs(sliders) do
+    local active
+    local function paint(value)
+        value = math.clamp(value, s.min, s.max)
+        local fraction = (value - s.min) / (s.max - s.min)
+        item[s.label].Text = tostring(value)
+        item[s.fill].Size = UDim2.new(fraction, 0, 1, 0)
+        item[s.handle].Position = UDim2.new(fraction, -item[s.handle].Size.X.Offset / 2, 0.5, -item[s.handle].Size.Y.Offset / 2)
+    end
+    local function update(input)
+        local bar = item[s.bar]
+        local fraction = math.clamp((input.Position.X - bar.AbsolutePosition.X) / math.max(1, bar.AbsoluteSize.X), 0, 1)
+        local value = math.floor(s.min + fraction * (s.max - s.min))
+        paint(value)
+        emit("slider", s.name, value)
+    end
+    paint(tonumber(item[s.label].Text) or s.min)
+    connect(item[s.handle].InputBegan, function(input)
+        if not active and pointerBegan(input) then
+            active = input
+            update(input)
+        end
+    end)
+    connect(UserInputService.InputChanged, function(input)
+        if pointerMoved(input, active) then
+            update(input)
+        end
+    end)
+    connect(UserInputService.InputEnded, function(input)
+        if pointerEnded(input, active) then
+            active = nil
+        end
+    end)
+end
+
+local destinations = {145, 147, 149, 151, 153, 155, 157, 159}
+local isOpen = false
+local collapsedHeight = mobile and 40 or 50
+local gap = mobile and 4 or 5
+local padding = 8
+item[143].Position = UDim2.new(0.55, 0, 0, (collapsedHeight - item[143].Size.Y.Offset) / 2)
+item[142].Size = UDim2.new(0.5, 0, 0, collapsedHeight - 10)
+
+local function dropdown(open)
+    if closed then
+        return
+    end
+    isOpen = open
+    local nextY = collapsedHeight + padding
+    for _, id in ipairs(destinations) do
+        local button = item[id]
+        button.Position = UDim2.new(0.55, 0, 0, nextY)
+        button.Visible = open
+        nextY += button.Size.Y.Offset + gap
+    end
+    local expandedHeight = nextY - gap + padding
+    item[140].Size = UDim2.new(0.95, 0, 0, open and expandedHeight or collapsedHeight)
+    atualizarCanvas(false)
+end
+connect(item[143].Activated, function()
+    dropdown(not isOpen)
+end)
+for _, id in ipairs(destinations) do
+    connect(item[id].Activated, function()
+        item[143].Text = item[id].Text
+        dropdown(false)
+        emit("teleporte", item[id].Text)
+    end)
+end
+
+local function auxiliary(button, status, on, off, event)
+    local enabled = false
+    connect(button.Activated, function()
+        enabled = not enabled
+        button.Text = enabled and on or off
+        if status then
+            status.Text = enabled and "Status: ON" or "Status: OFF"
+            status.TextColor3 = enabled and Color3.fromRGB(0, 180, 0) or Color3.fromRGB(255, 60, 60)
+        end
+        emit(event, enabled)
+    end)
+end
+auxiliary(item[199], item[198], "Desativar", "Ativar", "autoClick")
+auxiliary(item[225], nil, "Desativar", "Ativar", "municao")
+connect(item[225].Activated, function()
+    item[224].Text = item[225].Text == "Desativar" and "Munição Infinita: ON" or "Munição Infinita: OFF"
+end)
+auxiliary(item[232], item[230], "Auto: ON", "Auto: OFF", "autoReviver")
+connect(item[200].Activated, function()
+    emit("trocarLocal")
+end)
+connect(item[205].Activated, function()
+    emit("autoEntrarP1")
+end)
+connect(item[209].Activated, function()
+    local enabled = item[209].Text:find("ON", 1, true) == nil
+    item[209].Text = enabled and "🛸 FLY ON" or "🛸 FLY OFF"
+    emit("fly", enabled)
+end)
+for _, control in ipairs({{210, "flySubir"}, {212, "flyDescer"}}) do
+    local button, event = item[control[1]], control[2]
+    local active
+    connect(button.InputBegan, function(input)
+        if not active and pointerBegan(input) then
+            active = input
+            emit(event, true)
+        end
+    end)
+    connect(UserInputService.InputEnded, function(input)
+        if pointerEnded(input, active) then
+            active = nil
+            emit(event, false)
+        end
+    end)
+end
+connect(item[231].Activated, function()
+    emit("reviverAgora")
+end)
+
+atualizarJanela()
+mudarAba("Inicio")
+dropdown(false)
+
+if task and task.delay then
+    task.delay(3, function()
+        if not closed and item[181] and item[181].Parent then
+            item[181]:Destroy()
+        end
+    end)
+end
+
+return {
+    principal = item[17],
+    elementos = item,
+    selecionarAba = mudarAba,
+    destruir = function()
+        fechar()
+    end,
+}
