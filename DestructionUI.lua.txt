@@ -1,0 +1,1165 @@
+--[[
+    Senior Hub • Sources | Destruction UI Remake
+]]
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+local TextService = game:GetService("TextService")
+local Library = {Version = "1.0.2", Name="Senior Orbit"}
+local Icons = {
+    ["play"] = "rbxassetid://135609604299893",
+    ["pencil"] = "rbxassetid://137986121120732",
+    ["plus"] = "rbxassetid://111774323017047",
+    ["trash-2"] = "rbxassetid://109843431391323",
+    ["house"] = "rbxassetid://98755624629571",
+    ["layers"] = "rbxassetid://81973586053257",
+    ["sliders-horizontal"] = "rbxassetid://85538382643347",
+    ["settings"] = "rbxassetid://80758916183665",
+    ["search"] = "rbxassetid://121018724060431",
+    ["x"] = "rbxassetid://110786993356448",
+    ["minus"] = "rbxassetid://118026365011536",
+    ["chevron-down"] = "rbxassetid://134243273101015",
+    ["chevron-right"] = "rbxassetid://92473583511724",
+    ["check"] = "rbxassetid://93898873302694",
+    ["bell"] = "rbxassetid://97392696311902",
+    ["palette"] = "rbxassetid://86350350950064",
+    ["keyboard"] = "rbxassetid://121474456068237",
+    ["external-link"] = "rbxassetid://129331830773832",
+    ["code"] = "rbxassetid://107380207681249",
+    ["layout-grid"] = "rbxassetid://81344910161871",
+    ["user"] = "rbxassetid://81589895647169",
+    ["shield"] = "rbxassetid://110987169760162",
+    ["sparkles"] = "rbxassetid://138635884129147",
+    ["rotate-ccw"] = "rbxassetid://110116685948665",
+    ["menu"] = "rbxassetid://77021539815611",
+    ["maximize"] = "rbxassetid://76045941763188",
+    ["copy"] = "rbxassetid://78979572434545",
+    ["info"] = "rbxassetid://124560466474914",
+    ["circle-check"] = "rbxassetid://85262178816537",
+    ["crosshair"] = "rbxassetid://134242818164054",
+    ["eye"] = "rbxassetid://100033680381365",
+    ["boxes"] = "rbxassetid://136372617578355",
+    ["swords"] = "rbxassetid://81872698913435",
+    ["grip"] = "rbxassetid://109058783556768",
+    ["save"] = "rbxassetid://126116963775616",
+    ["folder"] = "rbxassetid://80846616596607",
+    ["sun"] = "rbxassetid://110150589884127",
+    ["moon"] = "rbxassetid://83380517901735",
+}
+local C = Color3.fromRGB
+local themes = {
+ Blossom={Background=C(27,28,29),Sidebar=C(22,23,24),Panel=C(34,36,38),Hover=C(46,49,52),Stroke=C(48,50,53),Text=C(226,229,234),Muted=C(139,144,151),Accent=C(122,171,224)},
+ Afterglow={Background=C(29,24,22),Sidebar=C(24,20,19),Panel=C(39,32,28),Hover=C(53,43,36),Stroke=C(60,48,39),Text=C(238,229,220),Muted=C(161,143,130),Accent=C(233,163,113)},
+ Ocean={Background=C(17,24,30),Sidebar=C(13,20,26),Panel=C(24,34,42),Hover=C(33,46,57),Stroke=C(42,55,65),Text=C(223,237,245),Muted=C(132,158,174),Accent=C(107,191,218)},
+ Rose={Background=C(28,23,29),Sidebar=C(23,19,24),Panel=C(39,31,40),Hover=C(52,42,53),Stroke=C(59,46,61),Text=C(240,227,238),Muted=C(165,140,160),Accent=C(218,145,181)},
+ Forest={Background=C(20,28,24),Sidebar=C(17,23,20),Panel=C(28,38,33),Hover=C(39,52,44),Stroke=C(46,59,51),Text=C(226,238,228),Muted=C(141,164,148),Accent=C(133,194,156)},
+ Graphite={Background=C(25,25,26),Sidebar=C(20,20,21),Panel=C(34,34,36),Hover=C(46,46,49),Stroke=C(51,51,54),Text=C(231,232,235),Muted=C(147,148,153),Accent=C(185,190,203)},
+ Frostbite={Background=C(21,27,34),Sidebar=C(17,22,28),Panel=C(29,37,46),Hover=C(42,54,66),Stroke=C(46,59,72),Text=C(228,240,249),Muted=C(137,159,178),Accent=C(133,205,241)},
+ Volt={Background=C(23,27,22),Sidebar=C(18,22,17),Panel=C(31,37,29),Hover=C(45,55,37),Stroke=C(52,62,43),Text=C(234,243,225),Muted=C(148,164,130),Accent=C(183,229,92)},
+ Obsidian={Background=C(17,16,21),Sidebar=C(13,12,17),Panel=C(25,23,31),Hover=C(38,33,48),Stroke=C(43,36,54),Text=C(232,226,243),Muted=C(144,133,163),Accent=C(170,139,222)},
+ ["Sakura Drift"]={Background=C(31,24,29),Sidebar=C(26,19,24),Panel=C(43,32,39),Hover=C(58,42,52),Stroke=C(65,46,58),Text=C(249,230,240),Muted=C(175,144,161),Accent=C(240,158,194)},
+ ["Neon Mirage"]={Background=C(17,25,28),Sidebar=C(12,20,23),Panel=C(24,35,39),Hover=C(31,49,53),Stroke=C(35,57,60),Text=C(222,247,245),Muted=C(129,173,171),Accent=C(79,225,203)},
+ ["Copper Dust"]={Background=C(30,26,23),Sidebar=C(24,21,19),Panel=C(41,35,30),Hover=C(56,46,37),Stroke=C(66,53,41),Text=C(241,230,215),Muted=C(170,150,126),Accent=C(200,149,105)},
+ Abyss={Background=C(10,20,28),Sidebar=C(7,15,22),Panel=C(16,29,40),Hover=C(23,41,56),Stroke=C(28,48,64),Text=C(221,238,250),Muted=C(116,149,173),Accent=C(80,162,219)},
+ Porcelain={Background=C(238,238,233),Sidebar=C(227,228,225),Panel=C(248,248,244),Hover=C(216,220,225),Stroke=C(198,201,204),Text=C(38,42,49),Muted=C(111,117,125),Accent=C(91,134,191)},
+
+}
+themes.Orqan={Background=C(16,15,20),Sidebar=C(14,13,18),Panel=C(20,19,26),Hover=C(28,26,35),Stroke=C(31,29,38),Text=C(236,235,240),Muted=C(116,113,129),Accent=C(229,65,98)}
+local function accentInk(color)
+    local function linear(v) return v<=.04045 and v/12.92 or ((v+.055)/1.055)^2.4 end
+    local light=.2126*linear(color.R)+.7152*linear(color.G)+.0722*linear(color.B)
+    return 1.05/(light+.05)>=4.5 and C(255,255,255) or C(10,14,20)
+end
+for _, theme in pairs(themes) do
+    theme.Inline=theme.Stroke:Lerp(theme.Panel,.5); theme.Gradient=C(255,255,255); theme.Shadow=C(0,0,0); theme.White=C(255,255,255); theme.Black=C(0,0,0); theme.Online=C(63,195,132); theme.AccentText=accentInk(theme.Accent)
+end
+local function make(class, props, parent)
+    local obj = Instance.new(class)
+    for key, value in pairs(props or {}) do obj[key] = value end
+    obj.Parent = parent
+    return obj
+end
+local function corner(obj, radius) make("UICorner", {CornerRadius=UDim.new(0,radius or 8)}, obj) end
+local function pad(obj, x, y)
+    make("UIPadding", {PaddingLeft=UDim.new(0,x),PaddingRight=UDim.new(0,x),PaddingTop=UDim.new(0,y or x),PaddingBottom=UDim.new(0,y or x)},obj)
+end
+local function list(obj, gap, horizontal)
+    return make("UIListLayout", {Padding=UDim.new(0,gap or 8),SortOrder=Enum.SortOrder.LayoutOrder,FillDirection=horizontal and Enum.FillDirection.Horizontal or Enum.FillDirection.Vertical},obj)
+end
+local function tween(obj, props)
+    TweenService:Create(obj,TweenInfo.new(.17,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),props):Play()
+end
+local function copy(value) if typeof(value)=="table" then local t={} for k,v in pairs(value) do t[k]=copy(v) end return t end return value end
+local function clamp(v,a,b) return math.max(a,math.min(b,v)) end
+local function round(v,step) return math.floor(v/step+.5)*step end
+local function options(o) if type(o)=="string" then return {Title=o} end return o or {} end
+local function image(name)
+    if type(name)=="number" then return "rbxassetid://"..tostring(name) end
+    name = tostring(name or "layers")
+    if name:match("^rbxassetid://") then return name end
+    return Icons[name:gsub("^lucide%-","")] or Icons.layers or ""
+end
+local function validBinding(key)
+    return typeof(key)=="EnumItem" and (key.EnumType==Enum.KeyCode or (key.EnumType==Enum.UserInputType and table.find({"MouseButton1","MouseButton2","MouseButton3"},key.Name)~=nil))
+end
+local function bindingMatches(input,key) return key.EnumType==Enum.UserInputType and input.UserInputType==key or input.KeyCode==key end
+local function inputBinding(input)
+    if input.KeyCode and input.KeyCode~=Enum.KeyCode.Unknown then return input.KeyCode end
+    if input.UserInputType and table.find({"MouseButton1","MouseButton2","MouseButton3"},input.UserInputType.Name) then return input.UserInputType end
+end
+function Library:CreateWindow(config)
+    config=config or {}
+    assert(config.ProfileStore==nil or (type(config.ProfileStore)=="table" and (config.ProfileStore.Profiles==nil or type(config.ProfileStore.Profiles)=="table")),"ProfileStore must be a table with an optional Profiles table")
+    local width,height=config.Width or 720,config.Height or 476
+    assert(type(width)=="number" and type(height)=="number" and width>=480 and width<=2400 and height>=320 and height<=1800,"Window size must be 480–2400 x 320–1800")
+    assert(config.Scale==nil or (type(config.Scale)=="number" and config.Scale>0 and config.Scale<=2),"Scale must be greater than 0 and at most 2")
+    local player=Players.LocalPlayer
+    assert(player or config.Parent,"Senior Orbit must run on the client")
+    local w={_gradients={},_textRecords={},Casing="Normal",Tabs={},Categories={},Sections={},DetachedSections={},Controls={},Flags={},Connections={},_bindings={},_searchables={},_popConnections={},_resultConnections={},_toasts={},Profiles={},Theme=copy(themes[config.Theme] or themes.Orqan),ThemeName=themes[config.Theme] and config.Theme or "Orqan",Visible=true,Destroyed=false,Keybind=config.Keybind or Enum.KeyCode.RightShift}
+    if config.Accent then w.Theme.Accent=config.Accent; w.Theme.AccentText=accentInk(config.Accent) end
+    function w:Connect(signal,fn) local c=signal:Connect(fn); table.insert(self.Connections,c); return c end
+    function w:Bind(obj,property,token) obj[property]=self.Theme[token]; table.insert(self._bindings,{obj,property,token}); return obj end
+    function w:Frame(parent,props,token) local f=make("Frame",props,parent); f.BorderSizePixel=0; if token then self:Bind(f,"BackgroundColor3",token) else f.BackgroundTransparency=1 end; return f end
+    function w:Text(parent,text,props,token)
+        local p={Text=tostring(text or ""),BackgroundTransparency=1,BorderSizePixel=0,Font=Enum.Font.BuilderSans,TextSize=12,TextXAlignment=Enum.TextXAlignment.Left}
+        for k,v in pairs(props or {}) do p[k]=v end
+        local obj=self:Bind(make("TextLabel",p,parent),"TextColor3",token or "Text")
+        local record={Object=obj,Base=obj.Text,Font=obj.Font}; table.insert(self._textRecords,record)
+        self:Connect(obj:GetPropertyChangedSignal("Text"),function() if not record.Lock and obj.Text~=record.Expected then record.Base=obj.Text; self:ApplyTextCase(record) end end)
+        self:ApplyTextCase(record); return obj
+    end
+    function w:ApplyTextCase(record)
+        local obj=record.Object; if not obj.Parent then return end; if record.Expected and obj.Text~=record.Expected then record.Base=obj.Text end; record.Lock=true
+        record.Expected=self.Casing=="Lower Case" and record.Base:lower() or self.Casing=="Upper Case" and record.Base:upper() or record.Base; obj.Text=record.Expected
+        obj.Font=self.Casing=="Bold Case" and Enum.Font.BuilderSansBold or record.Font; record.Lock=false
+    end
+    function w:SetCasing(mode)
+        assert(table.find({"Normal","Lower Case","Upper Case","Bold Case"},mode),"Invalid casing")
+        self.Casing=mode; for _,record in ipairs(self._textRecords) do self:ApplyTextCase(record) end
+    end
+    function w:Button(parent,props,token)
+        local p={Text="",BorderSizePixel=0,AutoButtonColor=false}; for k,v in pairs(props or {}) do p[k]=v end
+        local b=make("TextButton",p,parent); if token then self:Bind(b,"BackgroundColor3",token) elseif p.BackgroundTransparency==nil then b.BackgroundTransparency=1 end
+        if token=="Panel" or token=="Hover" then
+            self:Connect(b.MouseEnter,function() tween(b,{BackgroundColor3=self.Theme.Hover}) end)
+            self:Connect(b.MouseLeave,function() tween(b,{BackgroundColor3=self.Theme[token]}) end)
+        end
+        if token=="Panel" or token=="Hover" then local gradient=make("UIGradient",{Rotation=90,Color=ColorSequence.new(C(255,255,255),self.Theme.Gradient)},b); table.insert(self._gradients,gradient) end
+        return b
+    end
+    function w:Icon(parent,name,props,token)
+        local p={Image=image(name),Size=UDim2.fromOffset(16,16),BackgroundTransparency=1,ScaleType=Enum.ScaleType.Fit,BorderSizePixel=0}; for k,v in pairs(props or {}) do p[k]=v end
+        return self:Bind(make("ImageLabel",p,parent),"ImageColor3",token or "Muted")
+    end
+    function w:Stroke(obj) return self:Bind(make("UIStroke",{Thickness=1,ApplyStrokeMode=Enum.ApplyStrokeMode.Border},obj),"Color","Stroke") end
+    function w:PruneBindings()
+        local connected={};for _,connection in ipairs(self.Connections) do if connection.Connected then table.insert(connected,connection) end end;self.Connections=connected
+        local gradients={}; for _,gradient in ipairs(self._gradients) do if gradient.Parent then table.insert(gradients,gradient) end end; self._gradients=gradients
+        local texts={}; for _,record in ipairs(self._textRecords) do if record.Object.Parent then table.insert(texts,record) end end; self._textRecords=texts
+        local live={}; for _,b in ipairs(self._bindings) do if b[1].Parent then table.insert(live,b) end end; self._bindings=live end
+    function w:Call(fn,...) if not fn or self.Destroyed then return end; local args=table.pack(...); task.spawn(function() if self.Destroyed then return end; local ok,err=pcall(fn,table.unpack(args,1,args.n)); if not ok then warn("[Senior Orbit callback] "..tostring(err)) end end) end
+    function w:CloseSubPopup() if self.SubPopup then self.SubPopup:Destroy(); self.SubPopup=nil; self:PruneBindings(); local live={}; for _,c in ipairs(self.Connections) do if c.Connected then table.insert(live,c) end end; self.Connections=live end end
+    function w:ClosePopup()
+        self._capturing=nil
+        if self._modePopupControl then self._modePopupControl.RefreshKeyMenu=nil;self._modePopupControl=nil end
+        if self._popupOnClose then self._popupOnClose();self._popupOnClose=nil end
+        self:CloseSubPopup()
+        for _,c in ipairs(self._popConnections) do c:Disconnect() end; self._popConnections={}
+        if self.Popup then self.Popup:Destroy(); self.Popup=nil end
+        local live={}; for _,c in ipairs(self.Connections) do if c.Connected then table.insert(live,c) end end; self.Connections=live; self:PruneBindings()
+    end
+    function w:Destroy(external)
+        if self.Destroyed then return end; self.Destroyed=true; self:ClosePopup()
+        for _,c in ipairs(self._resultConnections) do c:Disconnect() end
+        for _,c in ipairs(self.Connections) do c:Disconnect() end
+        self.Connections={}; self._bindings={}; self._searchables={}; self._resultConnections={}; self._capturing=nil
+        for _,section in ipairs(self.Sections) do section._dragging=false end
+        self.DetachedSections={}; self._textRecords={}; self._gradients={}
+        if self.Gui and not external then self.Gui:Destroy() end
+    end
+    local parent=config.Parent or player:WaitForChild("PlayerGui")
+    for _,old in ipairs(parent:GetChildren()) do
+        if old:IsA("ScreenGui") and old.Name=="SeniorHubOrbit" then
+            local dispose=old:FindFirstChild("SeniorOrbitDispose"); if dispose then pcall(function() dispose:Invoke() end) end; old:Destroy()
+        end
+    end
+    local gui=make("ScreenGui",{Name="SeniorHubOrbit",ResetOnSpawn=false,IgnoreGuiInset=true,ZIndexBehavior=Enum.ZIndexBehavior.Sibling,DisplayOrder=config.DisplayOrder or 81},parent); w.Gui=gui
+    local dispose=make("BindableFunction",{Name="SeniorOrbitDispose"},gui); dispose.OnInvoke=function() w:Destroy(); return true end
+    w:Connect(gui.Destroying,function() w:Destroy(true) end)
+    local width,height=config.Width or 720,config.Height or 476; local sidebarWidth=80
+    assert(width>=480 and height>=320,"Minimum window size is 480 x 320")
+    local root=w:Frame(gui,{Name="OrbitWindow",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=UDim2.fromOffset(width,height),ClipsDescendants=true},"Background"); corner(root,16); w:Stroke(root); local shadow=make("UIStroke",{Thickness=4,Transparency=.68,ApplyStrokeMode=Enum.ApplyStrokeMode.Border},root); w:Bind(shadow,"Color","Shadow"); w.Root=root
+    local scale=make("UIScale",{Scale=1},root); w.Scale=scale
+    local function fit()
+        local size=workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or gui.AbsoluteSize
+        scale.Scale=math.max(.1,math.min(config.Scale or 1,(size.X-24)/width,(size.Y-50)/height))
+        local halfW,halfH=width*scale.Scale/2,height*scale.Scale/2
+        local x=root.Position.X.Scale*size.X+root.Position.X.Offset;local y=root.Position.Y.Scale*size.Y+root.Position.Y.Offset
+        root.Position=UDim2.fromOffset(clamp(x,halfW+8,math.max(halfW+8,size.X-halfW-8)),clamp(y,halfH+8,math.max(halfH+8,size.Y-halfH-8)))
+        if w.Restore then w.Restore.Position=UDim2.fromOffset(clamp(w.Restore.Position.X.Offset,8,math.max(8,size.X-48)),clamp(w.Restore.Position.Y.Offset,8,math.max(8,size.Y-48))) end
+        if w.ClampFloatingSections then w:ClampFloatingSections() end; if w.RefreshToasts then w:RefreshToasts() end
+    end
+    local cameraConnection
+    local function bindCamera() if cameraConnection then cameraConnection:Disconnect() end; if workspace.CurrentCamera then cameraConnection=w:Connect(workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"),fit) end; fit() end
+    w:Connect(workspace:GetPropertyChangedSignal("CurrentCamera"),bindCamera); bindCamera()
+    local sidebar=w:Frame(root,{Name="IconRail",Size=UDim2.new(0,80,1,0)},"Sidebar");w.Sidebar=sidebar
+    local drag=w:Button(sidebar,{Name="DragHandle",Modal=true,Size=UDim2.fromOffset(80,67)})
+    w:Icon(drag,config.Logo or 92834373646022,{Position=UDim2.fromOffset(20,16),Size=UDim2.fromOffset(40,40)},"White")
+    w.TitleLabel=w:Text(drag,config.Title or "Senior Hub • Sources",{Visible=false})
+    local nav=make("ScrollingFrame",{Name="Categories",Active=true,Position=UDim2.fromOffset(8,70),Size=UDim2.new(1,-16,1,-132),BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=2,ScrollBarImageTransparency=.35,ScrollingDirection=Enum.ScrollingDirection.Y,ClipsDescendants=true,CanvasSize=UDim2.new(),AutomaticCanvasSize=Enum.AutomaticSize.Y},sidebar);list(nav,5);w:Bind(nav,"ScrollBarImageColor3","Muted");w.Nav=nav
+    local border=w:Frame(root,{Name="ContentBorder",Position=UDim2.fromOffset(80,14),Size=UDim2.new(1,-94,1,-28)});corner(border,7);w:Stroke(border)
+    local header=w:Frame(root,{Name="Header",Position=UDim2.fromOffset(81,15),Size=UDim2.new(1,-96,0,46),ZIndex=2})
+    local headerDrag=w:Button(header,{Name="WindowDragHandle",Size=UDim2.new(1,-158,1,0),ZIndex=2})
+    w.Breadcrumb=w:Text(header,"Combat / Aimbot",{Position=UDim2.fromOffset(10,3),Size=UDim2.new(1,-165,0,20),TextSize=12,ZIndex=3})
+    w.Description=w:Text(header,"Customize the product as you wish",{Position=UDim2.fromOffset(10,20),Size=UDim2.new(1,-165,0,18),TextSize=11,ZIndex=3},"Muted")
+    w:Frame(header,{Position=UDim2.new(0,0,1,-1),Size=UDim2.new(1,0,0,1),ZIndex=3},"Stroke")
+    local pageButton=w:Button(header,{Name="SubtabDropdown",Position=UDim2.new(1,-150,0,7),Size=UDim2.fromOffset(139,30),ZIndex=4})
+    w.PageLabel=w:Text(pageButton,"Aimbot",{Position=UDim2.fromOffset(10,0),Size=UDim2.new(1,-34,1,0),TextSize=12,ZIndex=5})
+    w:Icon(pageButton,"chevron-down",{Position=UDim2.new(1,-18,0,10),Size=UDim2.fromOffset(10,10),ZIndex=5})
+    w:Connect(pageButton.Activated,function()
+        if not w.ActiveCategory then return end;local names={};for _,tab in ipairs(w.ActiveCategory.Tabs) do table.insert(names,tab.Title) end
+        w:OptionList(pageButton,names,function(name) return w.ActiveTab.Title==name end,function(name) for _,tab in ipairs(w.ActiveCategory.Tabs) do if tab.Title==name then tab:Select();break end end end)
+    end)
+    w.PageButton=pageButton
+    local searchFrame=w:Frame(sidebar,{Visible=false});local search=make("TextBox",{Text="",Visible=false},searchFrame);w.SearchBox=search
+    local pages=w:Frame(root,{Name="Pages",Position=UDim2.fromOffset(92,70),Size=UDim2.new(1,-118,1,-84)});w.Pages=pages
+    local avatar=w:Button(sidebar,{Name="AvatarSettings",Position=UDim2.new(0,24,1,-49),Size=UDim2.fromOffset(32,32)})
+    local avatarPlaceholder=w:Icon(avatar,"user",{Position=UDim2.fromOffset(6,6),Size=UDim2.fromOffset(20,20)},"Muted")
+    local avatarImage=make("ImageLabel",{Name="PlayerHeadshot",Size=UDim2.fromScale(1,1),BackgroundTransparency=1,BorderSizePixel=0,ImageColor3=C(255,255,255),ScaleType=Enum.ScaleType.Fit,Image=player and ("rbxthumb://type=AvatarHeadShot&id="..player.UserId.."&w=150&h=150") or ""},avatar)
+    corner(avatarImage,16);avatar.ClipsDescendants=true;w.AvatarButton=avatar;w.AvatarImage=avatarImage;w.AvatarPlaceholder=avatarPlaceholder
+    local function avatarLoaded() if avatarImage.Parent then avatarPlaceholder.Visible=not avatarImage.IsLoaded end end
+    w:Connect(avatarImage:GetPropertyChangedSignal("IsLoaded"),avatarLoaded);avatarLoaded()
+    local avatarGeneration=0
+    function w:RefreshAvatar()
+        avatarGeneration=avatarGeneration+1;local generation=avatarGeneration
+        if not player or self.Destroyed then return end
+        local retryDelays={.35,1,2,4}
+        local function fetch(attempt)
+            if self.Destroyed or generation~=avatarGeneration or not avatarImage.Parent then return end
+            local ok,url,ready=pcall(function() return Players:GetUserThumbnailAsync(player.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size150x150) end)
+            if ok and ready==true and type(url)=="string" and url~="" then if avatarImage.Image~=url then avatarImage.Image=url end end
+            avatarLoaded()
+            if (not ok or ready~=true or not avatarImage.IsLoaded) and retryDelays[attempt] then task.delay(retryDelays[attempt],function() fetch(attempt+1) end) end
+        end
+        task.spawn(function() fetch(1) end)
+    end
+    w:RefreshAvatar()
+    function w:SetScale(value) assert(type(value)=="number" and value>=.5 and value<=1.25,"Scale must be .5–1.25");config.Scale=value;fit();self:ClosePopup();return self end
+    function w:SetNotificationsVisible(value) self.HideNotifications=value~=true;for _,toast in ipairs(self._toasts) do toast.Visible=value==true end end
+    function w:OpenUISettings()
+        local frame=self:PopupAt(avatar,202,157,{Left=true,OffsetX=40});frame.Name="UISettings"
+        local sf=scale.Scale;local view=gui.AbsoluteSize
+        frame.Position=UDim2.fromOffset(clamp(avatar.AbsolutePosition.X+40*sf,8,math.max(8,view.X-202*sf-8)),clamp(avatar.AbsolutePosition.Y-130*sf,8,math.max(8,view.Y-157*sf-8)))
+        self:Text(frame,"UI Settings",{Position=UDim2.fromOffset(10,3),Size=UDim2.fromOffset(180,23),TextSize=12,ZIndex=204})
+        self:Text(frame,"UI Scale",{Position=UDim2.fromOffset(10,28),Size=UDim2.fromOffset(180,20),TextSize=11,ZIndex=204},"Muted")
+        local scaleButton=self:Button(frame,{Name="UIScaleField",Position=UDim2.fromOffset(10,51),Size=UDim2.fromOffset(182,25),ZIndex=203},"Panel");corner(scaleButton,3)
+        self:Text(scaleButton,tostring(math.floor((config.Scale or 1)*100)).."%",{Position=UDim2.fromOffset(8,0),Size=UDim2.new(1,-28,1,0),TextSize=11,ZIndex=204})
+        self:Icon(scaleButton,"chevron-down",{Position=UDim2.fromOffset(165,9),Size=UDim2.fromOffset(9,9),ZIndex=204})
+        self:Connect(scaleButton.Activated,function() self:OptionList(scaleButton,{"50%","70%","100%","125%"},function(value) return tonumber(value:sub(1,-2))==math.floor((config.Scale or 1)*100) end,function(value) self:SetScale(tonumber(value:sub(1,-2))/100) end,{Nested=true}) end)
+        local function setting(title,y,get,set)
+            local button=self:Button(frame,{Position=UDim2.fromOffset(10,y),Size=UDim2.fromOffset(182,27),ZIndex=203})
+            self:Text(button,title,{Size=UDim2.new(1,-30,1,0),TextSize=11,ZIndex=204},"Muted")
+            local track=self:Frame(button,{Position=UDim2.new(1,-25,0,7),Size=UDim2.fromOffset(25,14),ZIndex=204},"Hover");corner(track,10)
+            local knob=self:Frame(track,{Size=UDim2.fromOffset(9,9),Position=UDim2.fromOffset(3,2),ZIndex=205},"Muted");corner(knob,10)
+            local function refresh() knob.Position=UDim2.fromOffset(get() and 13 or 3,2);knob.BackgroundColor3=get() and self.Theme.Accent or self.Theme.Muted end
+            self:Connect(button.Activated,function() set(not get());refresh() end);refresh()
+        end
+        setting("Hide Notifications",84,function() return self.HideNotifications==true end,function(value) self:SetNotificationsVisible(not value) end)
+        setting("Hide Watermark",116,function() return not self.Watermark.Visible end,function(value) self:SetWatermarkVisible(not value) end)
+        return frame
+    end
+    w:Connect(avatar.Activated,function() w:OpenUISettings() end)
+    local searchOverlay=w:Frame(root,{Name="SearchModalOverlay",Size=UDim2.fromScale(1,1),Visible=false,ZIndex=180},"Black"); searchOverlay.BackgroundTransparency=.48; w.SearchOverlay=searchOverlay
+    local dismissSearch=w:Button(searchOverlay,{Size=UDim2.fromScale(1,1),ZIndex=180})
+    local results=w:Frame(searchOverlay,{Name="SearchResults",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,.5),Size=UDim2.fromOffset(math.min(480,width-48),math.min(380,height-48)),ZIndex=181},"Sidebar"); corner(results,5); w:Stroke(results); w.SearchPanel=results
+    local summary=w:Text(results,"Search",{Position=UDim2.fromOffset(16,12),Size=UDim2.new(1,-32,0,25),TextSize=13,ZIndex=182})
+    local modalInput=w:Bind(make("TextBox",{Name="SearchModalInput",Position=UDim2.fromOffset(16,47),Size=UDim2.new(1,-32,0,33),Text="",PlaceholderText="Type to search...",ClearTextOnFocus=false,Font=Enum.Font.BuilderSans,TextSize=12,TextXAlignment=Enum.TextXAlignment.Left,BorderSizePixel=0,ZIndex=183},results),"BackgroundColor3","Panel"); w:Bind(modalInput,"TextColor3","Text"); w:Bind(modalInput,"PlaceholderColor3","Muted"); corner(modalInput,4); pad(modalInput,11,0); w.ModalSearchBox=modalInput
+    local resultList=make("ScrollingFrame",{Active=true,Position=UDim2.fromOffset(16,92),Size=UDim2.new(1,-32,1,-106),CanvasSize=UDim2.new(),AutomaticCanvasSize=Enum.AutomaticSize.Y,BorderSizePixel=0,BackgroundTransparency=1,ScrollBarThickness=2,ZIndex=182},results); list(resultList,3); w:Bind(resultList,"ScrollBarImageColor3","Accent")
+    local restore=w:Button(gui,{Name="Restore",Position=UDim2.fromOffset(18,160),Size=UDim2.fromOffset(40,40),Visible=false},"Sidebar"); corner(restore,9); w:Stroke(restore); w:Icon(restore,config.Logo or 92834373646022,{Position=UDim2.fromOffset(7,7),Size=UDim2.fromOffset(26,26)},"White"); w.Restore=restore
+    function w:PopupAt(anchor,pw,ph,o)
+        o=o or {}; self:ClosePopup(); local view=gui.AbsoluteSize
+        local popupScale=math.max(.1,math.min(o.Scale or scale.Scale,(view.X-16)/pw,(view.Y-16)/ph))
+        local x=clamp((o.Left and anchor.AbsolutePosition.X or anchor.AbsolutePosition.X+anchor.AbsoluteSize.X-pw*popupScale)+(o.OffsetX or 0)*popupScale,8,math.max(8,view.X-pw*popupScale-8))
+        local gap=(o.Gap or 4)*popupScale; local y=anchor.AbsolutePosition.Y+anchor.AbsoluteSize.Y+gap
+        if y+ph*popupScale>view.Y-8 then y=math.max(8,anchor.AbsolutePosition.Y-ph*popupScale-gap) end
+        local overlay=self:Button(gui,{Name="PopupOverlay",Size=UDim2.fromScale(1,1),ZIndex=200}); self.Popup=overlay
+        local frame=self:Frame(overlay,{Position=UDim2.fromOffset(x,y),Size=UDim2.fromOffset(pw,ph),ZIndex=201,ClipsDescendants=true},"Sidebar"); corner(frame,3); self:Stroke(frame); make("UIScale",{Scale=popupScale},frame)
+        self:Button(frame,{Size=UDim2.fromScale(1,1),ZIndex=201}); self:Connect(overlay.Activated,function() self:ClosePopup() end); return frame
+    end
+    w:Connect(UIS.InputBegan,function(input,processed) if input.KeyCode==Enum.KeyCode.Escape and not processed and not w._capturing and w.Popup then if w.SubPopup then w:CloseSubPopup() else w:ClosePopup() end end end)
+    function w:OptionList(anchor,values,isSelected,onSelect,o)
+        o=o or {}; local sf=o.Scale or scale.Scale
+        local pw=math.max(80,anchor.AbsoluteSize.X/math.max(.1,sf)); local ph=math.min(#values,o.MaxVisible or 10)*30+4
+        local frame
+        if o.Nested then
+            self:CloseSubPopup()
+            local view=gui.AbsoluteSize; sf=math.max(.1,math.min(sf,(view.X-16)/pw,(view.Y-16)/ph))
+            local x=clamp(anchor.AbsolutePosition.X,8,math.max(8,view.X-pw*sf-8)); local y=anchor.AbsolutePosition.Y+anchor.AbsoluteSize.Y+3*sf
+            if y+ph*sf>view.Y-8 then y=math.max(8,anchor.AbsolutePosition.Y-ph*sf-3*sf) end
+            local overlay=self:Button(gui,{Name="NestedOptionOverlay",Size=UDim2.fromScale(1,1),ZIndex=250}); self.SubPopup=overlay
+            frame=self:Frame(overlay,{Name="OptionList",Position=UDim2.fromOffset(x,y),Size=UDim2.fromOffset(pw,ph),ZIndex=251,ClipsDescendants=true},"Sidebar"); make("UIScale",{Scale=sf},frame); corner(frame,3); self:Stroke(frame)
+            self:Connect(overlay.Activated,function() self:CloseSubPopup() end)
+        else frame=self:PopupAt(anchor,pw,ph,{Scale=sf,Left=true,Gap=3}); frame.Name="OptionList" end
+        self:Bind(frame,"BackgroundColor3","Hover")
+        local z=o.Nested and 252 or 202
+        local scroll=make("ScrollingFrame",{Name="Options",ScrollingDirection=Enum.ScrollingDirection.Y,ClipsDescendants=true,Position=UDim2.fromOffset(2,2),Size=UDim2.new(1,-4,1,-4),CanvasSize=UDim2.new(),AutomaticCanvasSize=Enum.AutomaticSize.Y,BackgroundTransparency=1,BorderSizePixel=0,Active=true,ScrollBarThickness=2,ZIndex=z},frame); list(scroll,0); self:Bind(scroll,"ScrollBarImageColor3","Accent")
+        local entries={}
+        local function refresh()
+            for _,item in ipairs(entries) do local selected=isSelected(item.Value); item.Bar.Visible=selected; item.Button.BackgroundTransparency=1; item.Label.TextColor3=selected and self.Theme.Text or self.Theme.Muted end
+        end
+        for index,value in ipairs(values) do
+            local button=self:Button(scroll,{Name="Option",LayoutOrder=index,Size=UDim2.new(1,-2,0,30),ZIndex=z+1},"Hover"); corner(button,2)
+            local bar=self:Frame(button,{Name="SelectionAccent",Position=UDim2.fromOffset(8,13),Size=UDim2.fromOffset(4,4),ZIndex=z+2},"Accent")
+            corner(bar,4)
+            local label=self:Text(button,value,{Position=UDim2.fromOffset(19,0),Size=UDim2.new(1,-18,1,0),TextSize=12,ZIndex=z+2},"Muted")
+            table.insert(entries,{Value=value,Button=button,Label=label,Bar=bar})
+            self:Connect(button.Activated,function() onSelect(value); if frame.Parent then refresh() end end)
+        end
+        refresh(); local fullSize=frame.Size; frame.Size=UDim2.new(fullSize.X.Scale,fullSize.X.Offset,0,0); tween(frame,{Size=fullSize}); return frame
+    end
+    function w:RefreshDependencies()
+        for _,control in ipairs(self.Controls) do if control.RefreshEnabled then control:RefreshEnabled() end end
+    end
+    function w:GetDetachedSections()
+        local sections={}; for section in pairs(self.DetachedSections) do table.insert(sections,section) end; return sections
+    end
+    function w:DockAllSections()
+        for _,section in ipairs(self:GetDetachedSections()) do section:Dock(false) end
+    end
+    function w:ClampFloatingSections()
+        for section in pairs(self.DetachedSections) do section:RefreshFloatingBounds() end
+    end
+    w:Connect(gui:GetPropertyChangedSignal("AbsoluteSize"),function() w:ClampFloatingSections() end)
+    function w:Toggle(state)
+        if self.Destroyed then return end; if state==nil then state=not self.Visible end
+        self.Visible=state; root.Visible=state; restore.Visible=not state; if not state then self:CloseSearch() end
+        for _,section in ipairs(self.Sections) do section._dragging=false; if section.Float then section.Float.Visible=state and section._visible end end
+        self:ClosePopup()
+    end
+    function w:SetKeybind(key) assert(typeof(key)=="EnumItem" and key.EnumType==Enum.KeyCode,"Expected Enum.KeyCode"); self.Keybind=key end
+    local dragging,start,origin,touch,restoreDragging,restoreOrigin,restoreStart,restoreTouch,moved
+    w:Connect(drag.InputBegan,function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragging=true; start=i.Position; origin=root.Position; touch=i; w:ClosePopup() end end)
+    w:Connect(headerDrag.InputBegan,function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragging=true;start=i.Position;origin=root.Position;touch=i;w:ClosePopup() end end)
+    w:Connect(restore.InputBegan,function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then restoreDragging=true; restoreOrigin=restore.Position; restoreStart=i.Position; restoreTouch=i; moved=false end end)
+    local suppressRestore=0
+    w:Connect(restore.Activated,function() if os.clock()>=suppressRestore then w:Toggle(true) end end)
+    w:Connect(UIS.InputChanged,function(i)
+        if dragging and (i==touch or i.UserInputType==Enum.UserInputType.MouseMovement) then
+            local d=i.Position-start; local view=gui.AbsoluteSize; local actual=root.AbsoluteSize
+            root.Position=UDim2.fromOffset(clamp(origin.X.Scale*view.X+origin.X.Offset+d.X,actual.X/2,math.max(actual.X/2,view.X-actual.X/2)),clamp(origin.Y.Scale*view.Y+origin.Y.Offset+d.Y,actual.Y/2,math.max(actual.Y/2,view.Y-actual.Y/2)))
+        end
+        if restoreDragging and (i==restoreTouch or i.UserInputType==Enum.UserInputType.MouseMovement) then
+            local d=i.Position-restoreStart; moved=moved or d.X*d.X+d.Y*d.Y>36; if moved then local v=gui.AbsoluteSize; restore.Position=UDim2.fromOffset(clamp(restoreOrigin.X.Offset+d.X,8,math.max(8,v.X-48)),clamp(restoreOrigin.Y.Offset+d.Y,8,math.max(8,v.Y-48))) end
+        end
+    end)
+    w:Connect(UIS.WindowFocusReleased,function() dragging=false;restoreDragging=false;for _,section in ipairs(w.Sections) do section._dragging=false end;w:ClosePopup() end)
+    w:Connect(UIS.InputEnded,function(i) if i==touch or i.UserInputType==Enum.UserInputType.MouseButton1 then dragging=false end; if i==restoreTouch or i.UserInputType==Enum.UserInputType.MouseButton1 then if moved then suppressRestore=os.clock()+.25 end; restoreDragging=false end end)
+    w:Connect(UIS.InputBegan,function(i,processed)
+        if processed or UIS:GetFocusedTextBox() or w._capturing then return end
+        if i.KeyCode==w.Keybind then w:Toggle() end
+    end)
+    local watermark=w:Frame(gui,{Name="Watermark",AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,-14,0,14),Size=UDim2.fromOffset(80,30),Visible=config.Watermark~=false},"Sidebar"); corner(watermark,5); w:Stroke(watermark)
+    w:Icon(watermark,config.Logo or 92834373646022,{Position=UDim2.fromOffset(7,5),Size=UDim2.fromOffset(15,15)},"White")
+    w.WatermarkText=w:Text(watermark,config.WatermarkText or "Senior Hub • Sources   |   Orbit   |   Client UI",{Position=UDim2.fromOffset(28,0),Size=UDim2.new(1,-34,1,0),TextSize=10,TextTruncate=Enum.TextTruncate.AtEnd}); w.Watermark=watermark
+    local markScale=make("UIScale",{Scale=1},watermark);w.WatermarkScale=markScale
+    function w:FitWatermark()
+        if self.Destroyed then return end
+        local text=self.WatermarkText;local measured
+        local ok,bounds=pcall(function() return TextService:GetTextSize(text.Text,text.TextSize,text.Font,Vector2.new(16384,64)) end)
+        if ok and bounds then measured=bounds.X else measured=(utf8.len(text.Text) or #text.Text)*(text.TextSize or 10)*.54 end
+        local contentWidth=math.max(80,math.ceil(measured)+36)
+        watermark.Size=UDim2.fromOffset(contentWidth,30);self.WatermarkContentWidth=contentWidth
+        markScale.Scale=math.max(.05,math.min(1,(gui.AbsoluteSize.X-28)/contentWidth))
+    end
+    w:Connect(w.WatermarkText:GetPropertyChangedSignal("Text"),function() w:FitWatermark() end)
+    w:Connect(w.WatermarkText:GetPropertyChangedSignal("TextSize"),function() w:FitWatermark() end)
+    w:Connect(w.WatermarkText:GetPropertyChangedSignal("Font"),function() w:FitWatermark() end)
+    w:Connect(gui:GetPropertyChangedSignal("AbsoluteSize"),function() w:FitWatermark() end)
+    w:FitWatermark()
+    local hotkeys=w:Frame(gui,{Name="Hotkeys",AnchorPoint=Vector2.new(0,.5),Position=UDim2.new(0,14,.5,0),Size=UDim2.fromOffset(164,0),AutomaticSize=Enum.AutomaticSize.Y,Visible=config.Hotkeys==true},"Sidebar"); corner(hotkeys,5); w:Stroke(hotkeys); pad(hotkeys,8); list(hotkeys,3); w.Hotkeys=hotkeys
+    w:Text(hotkeys,"Hotkeys",{Size=UDim2.new(1,0,0,19),Font=Enum.Font.BuilderSansMedium,LayoutOrder=0})
+    local hotkeyRows={}
+    function w:RefreshHotkeys()
+        for _,row in ipairs(hotkeyRows) do row:Destroy() end; hotkeyRows={}; self:PruneBindings()
+        for _,c in ipairs(self.Controls) do
+            if c.Keybind and c.Value==true and #hotkeyRows<6 then
+                local row=self:Frame(hotkeys,{Size=UDim2.new(1,0,0,18),LayoutOrder=#hotkeyRows+1}); table.insert(hotkeyRows,row)
+                self:Text(row,c.HotkeyTitle or c.Title,{Size=UDim2.new(.65,0,1,0),TextSize=11,TextTruncate=Enum.TextTruncate.AtEnd})
+                self:Text(row,c.Keybind.Name,{Position=UDim2.fromScale(.65,0),Size=UDim2.new(.35,0,1,0),TextSize=9,TextXAlignment=Enum.TextXAlignment.Right},"Muted")
+            end
+        end
+    end
+    function w:SetWatermarkVisible(value) watermark.Visible=value==true end
+    function w:SetHotkeysVisible(value) hotkeys.Visible=value==true end
+    function w:SetWatermark(text) self.CustomWatermark=true;self.WatermarkText.Text=tostring(text);self:FitWatermark() end
+    function w:RefreshTheme()
+        local alive={}; for _,b in ipairs(self._bindings) do if b[1].Parent then b[1][b[2]]=self.Theme[b[3]]; table.insert(alive,b) end end; self._bindings=alive
+        local gradients={}; for _,gradient in ipairs(self._gradients) do if gradient.Parent then gradient.Color=ColorSequence.new(C(255,255,255),self.Theme.Gradient); table.insert(gradients,gradient) end end; self._gradients=gradients
+        for _,c in ipairs(self.Controls) do c:Refresh();if c.RefreshKeyMenu then c:RefreshKeyMenu() end end; for _,t in ipairs(self.Tabs) do t:Refresh() end; self:RefreshHotkeys()
+    end
+    function w:SetTheme(name) assert(themes[name],"Unknown theme"); self.ThemeName=name; self.Theme=copy(themes[name]); self:RefreshTheme() end
+    function w:SetThemeColor(token,color) assert(self.Theme[token] and typeof(color)=="Color3","Invalid theme color"); self.Theme[token]=color; if token=="Accent" then self.Theme.AccentText=accentInk(color) end; self:RefreshTheme() end
+    function w:SetAccent(color) self:SetThemeColor("Accent",color) end
+    function w:Find(query)
+        query=tostring(query or ""):lower():match("^%s*(.-)%s*$"); local found={}; if query=="" then return found end
+        for _,t in ipairs(self.Tabs) do if (t.Title.." "..t.Description.." "..t.Category.Title):lower():find(query,1,true) then table.insert(found,{Tab=t,Title=t.Title,Kind="Tab"}) end end
+        for _,entry in ipairs(self._searchables) do if entry.Frame.Parent and entry.Search:find(query,1,true) then table.insert(found,entry) end end
+        return found
+    end
+    function w:OpenSearchResult(result)
+        if not result or self.Destroyed or not table.find(self.Tabs,result.Tab) then return false end
+        self:CloseSearch(); result.Tab:Select(); local target=result.Frame
+        if target then task.defer(function()
+            if self.Destroyed or self.ActiveTab~=result.Tab or not target.Parent then return end
+            local section=result.Section
+            local page=result.Column; local targetScale=scale.Scale
+            if section and section.IsDetached then
+                section:BringToFront(); page=target==section.Header and nil or section.FloatScroll; targetScale=section.FloatScale.Scale
+            end
+            if page then local offset=(target.AbsolutePosition.Y-page.AbsolutePosition.Y)/math.max(.1,targetScale)+page.CanvasPosition.Y; page.CanvasPosition=Vector2.new(0,math.max(0,offset-6)) end
+            local stroke=make("UIStroke",{Name="SearchHighlight",Color=self.Theme.Accent,Thickness=1.5},target)
+            task.delay(1.4,function() if stroke.Parent then stroke:Destroy() end end)
+        end) end
+        return true
+    end
+    function w:Search(query)
+        if self.Destroyed then return {} end
+        query=tostring(query or ""); self._globalQuery=query; if search.Text~=query then search.Text=query end
+        for _,c in ipairs(self._resultConnections) do c:Disconnect() end; self._resultConnections={}
+        for _,child in ipairs(resultList:GetChildren()) do if child:IsA("TextButton") then child:Destroy() end end
+        self.SearchResults=self:Find(query); local active=query:match("%S")~=nil or self._searchOpen==true; searchOverlay.Visible=active; results.Visible=active; pages.Visible=true; if modalInput.Text~=query then modalInput.Text=query end
+        summary.Text=query:match("%S") and query or "Search"
+        for i,result in ipairs(self.SearchResults) do if i>150 then break end
+            local row=self:Button(resultList,{Size=UDim2.new(1,-3,0,46),ZIndex=183},"Panel"); corner(row,2); self:Frame(row,{Position=UDim2.fromOffset(3,6),Size=UDim2.fromOffset(2,34),ZIndex=184},"Accent")
+            self:Text(row,result.Title,{Position=UDim2.fromOffset(10,3),Size=UDim2.new(1,-20,0,20),TextSize=12,ZIndex=184})
+            self:Text(row,result.Tab.Title..(result.Section and " / "..result.Section.Title or "").." · "..result.Kind,{Position=UDim2.fromOffset(10,23),Size=UDim2.new(1,-20,0,16),TextSize=10,ZIndex=184},"Muted")
+            table.insert(self._resultConnections,row.Activated:Connect(function() self:OpenSearchResult(result) end))
+        end
+        self:PruneBindings(); return self.SearchResults
+    end
+    function w:ShowSearch() self._searchOpen=true; self:Search(search.Text); modalInput:CaptureFocus() end
+    function w:CloseSearch() if self._searchOpen or (self._globalQuery and self._globalQuery~="") then self:Search("") end;self._searchOpen=false;searchOverlay.Visible=false;modalInput:ReleaseFocus() end
+    w:Connect(dismissSearch.Activated,function() w:CloseSearch() end)
+    w:Connect(search.Focused,function() w:ShowSearch() end)
+    w:Connect(modalInput:GetPropertyChangedSignal("Text"),function() if modalInput.Text~=w._globalQuery then w:Search(modalInput.Text) end end)
+    w:Connect(modalInput.FocusLost,function(enter) if enter and w.SearchResults and w.SearchResults[1] then w:OpenSearchResult(w.SearchResults[1]) end end)
+    w:Connect(UIS.InputBegan,function(input) if input.KeyCode==Enum.KeyCode.Escape and searchOverlay.Visible then w:CloseSearch() end end)
+    w.Filter=w.Search
+    w:Connect(search:GetPropertyChangedSignal("Text"),function() if search.Text~=w._globalQuery then w:Search(search.Text) end end)
+    w:Connect(search.FocusLost,function(enter) if enter and w.SearchResults and w.SearchResults[1] then w:OpenSearchResult(w.SearchResults[1]) end end)
+    function w:EnsureCategoryVisible(category)
+        local button=category and category.Button
+        if self.Destroyed or not button or not button.Parent then return end
+        local y=button.AbsolutePosition.Y-nav.AbsolutePosition.Y;local height=button.AbsoluteSize.Y
+        if y<0 then nav.CanvasPosition=Vector2.new(0,math.max(0,nav.CanvasPosition.Y+y))
+        elseif y+height>nav.AbsoluteSize.Y then nav.CanvasPosition=Vector2.new(0,math.max(0,nav.CanvasPosition.Y+y+height-nav.AbsoluteSize.Y)) end
+    end
+    function w:CreateCategory(o)
+        o=options(o);local name=o.Title or "General";if self.Categories[name] then return self.Categories[name] end
+        local icons={Combat="swords",Visuals="eye",Player="user",Misc="boxes",Settings="settings"}
+        local category={Title=name,Icon=o.Icon or icons[name] or "layers",Window=self,Tabs={}}
+        local index=0;for _ in pairs(self.Categories) do index=index+1 end
+        local button=self:Button(nav,{Name="Category_"..name,Size=UDim2.fromOffset(64,50),LayoutOrder=index});category.Button=button
+        local glyph=self:Icon(button,category.Icon,{Position=UDim2.fromOffset(22,16),Size=UDim2.fromOffset(20,20)});category.Glyph=glyph
+        function category:CreateTab(tabConfig) tabConfig=options(tabConfig);tabConfig.Category=self.Title;return self.Window:CreateTab(tabConfig) end
+        function category:Select() local tab=self.LastTab or self.Tabs[1];if tab then tab:Select() end end
+        self:Connect(button.Activated,function() category:Select() end)
+        self.Categories[name]=category;return category
+    end
+    function w:CreateTab(o)
+        o=options(o);local category=self:CreateCategory(o.Category or "General")
+        local tab={Window=self,Category=category,Title=o.Title or "Tab",Icon=o.Icon or category.Icon,Description=o.Description or "Customize the product as you wish",Sections={},Columns={}}
+        local page=self:Frame(pages,{Name="Tab_"..tab.Title,Size=UDim2.fromScale(1,1),Visible=false});tab.Page=page
+        for i=1,3 do
+            local column=make("ScrollingFrame",{Name="Column"..i,Active=true,Position=i==2 and UDim2.new(.5,7,0,0) or UDim2.new(),Size=i==3 and UDim2.fromScale(1,1) or UDim2.new(.5,-7,1,0),Visible=i~=3,CanvasSize=UDim2.new(),AutomaticCanvasSize=Enum.AutomaticSize.Y,ScrollBarThickness=2,BackgroundTransparency=1,BorderSizePixel=0},page);list(column,10);self:Bind(column,"ScrollBarImageColor3","Stroke");tab.Columns[i]=column
+        end
+        function tab:Refresh() for _,cat in pairs(w.Categories) do cat.Glyph.ImageColor3=w.ActiveCategory==cat and w.Theme.Text or w.Theme.Muted end end
+        function tab:Select()
+            if w.Destroyed then return end;if w.ActiveTab then w.ActiveTab.Page.Visible=false end
+            w.ActiveTab=self;w.ActiveCategory=self.Category;self.Category.LastTab=self;self.Page.Visible=true
+            w.Breadcrumb.Text=self.Category.Title.." / "..self.Title;w.Description.Text=self.Description;w.PageLabel.Text=self.Title
+            w:CloseSearch();w:ClosePopup();self:Refresh();task.defer(function() if not w.Destroyed and w.ActiveTab==self then w:EnsureCategoryVisible(self.Category) end end);return self
+        end
+        function tab:CreateSection(sectionConfig)
+            sectionConfig=options(sectionConfig); local column=self.Columns[sectionConfig.FullWidth and 3 or (sectionConfig.Side=="Right" and 2 or 1)]
+            local s={Window=w,Tab=self,Column=column,Title=sectionConfig.Title or "Section"}
+            local holder=w:Frame(column,{Size=UDim2.new(1,-3,0,0),AutomaticSize=Enum.AutomaticSize.Y,LayoutOrder=#self.Sections+1}); list(holder,3)
+            local head=w:Frame(holder,{Size=UDim2.new(1,0,0,28),LayoutOrder=0})
+            w:Frame(head,{Position=UDim2.new(0,0,1,-1),Size=UDim2.new(1,0,0,1)},"Stroke")
+            w:Text(head,sectionConfig.Title or "Section",{Position=UDim2.fromOffset(12,0),Size=UDim2.new(1,-48,1,0),TextSize=12})
+            local panel=w:Frame(holder,{Size=UDim2.new(1,0,0,0),AutomaticSize=Enum.AutomaticSize.Y,LayoutOrder=1},"Panel"); panel.BackgroundTransparency=1;pad(panel,12,5);list(panel,0); s.Frame=panel; s.Container=holder
+            s.Header=head; s.IsDetached=false; s.Draggable=sectionConfig.Draggable==true; s._visible=true
+            local grip=w:Icon(head,"grip",{Position=UDim2.new(1,-17,0,5),Size=UDim2.fromOffset(11,11),Visible=s.Draggable})
+            local sectionDrag=w:Button(head,{Name="SectionDragHandle",Size=UDim2.new(1,-22,1,0),Active=s.Draggable,ZIndex=2})
+            local dock=w:Button(head,{Name="DockSection",Position=UDim2.new(1,-22,0,0),Size=UDim2.fromOffset(22,21),Visible=false,ZIndex=4})
+            w:Icon(dock,"rotate-ccw",{Position=UDim2.fromOffset(5,4),Size=UDim2.fromOffset(12,12),ZIndex=5},"Accent")
+            s.DragHandle=sectionDrag; s.DockButton=dock
+            local function viewport()
+                local v=gui.AbsoluteSize
+                if v.X<32 or v.Y<32 then v=workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Vector2.new(1280,720) end
+                return v
+            end
+            if sectionConfig.FullWidth then self.Columns[1].Visible=false;self.Columns[2].Visible=false;self.Columns[3].Visible=true end
+            function s:BringToFront()
+                if w.Destroyed or not self.IsDetached then return false end
+                w._floatZ=(w._floatZ or 100)+1
+                if w._floatZ>=180 then
+                    for other in pairs(w.DetachedSections) do if other.Float then other.Float.ZIndex=100 end end
+                    w._floatZ=101
+                end
+                self.Float.ZIndex=w._floatZ; return true
+            end
+            function s:SetPosition(x,y)
+                if w.Destroyed or not self.IsDetached then return false end
+                assert(type(x)=="number" and x==x and math.abs(x)~=math.huge and type(y)=="number" and y==y and math.abs(y)~=math.huge,"Position must be finite")
+                local v=viewport(); local sf=self.FloatScale.Scale
+                x=clamp(x,8,math.max(8,v.X-self._floatWidth*sf-8))
+                y=clamp(y,8,math.max(8,v.Y-self._floatHeight*sf-8))
+                self.Float.Position=UDim2.fromOffset(x,y); return true
+            end
+            function s:RefreshFloatingBounds()
+                if w.Destroyed or not self.IsDetached or self._fitting then return end
+                self._fitting=true
+                local v=viewport(); local oldScale=math.max(.01,self.FloatScale.Scale)
+                local content=panel.AbsoluteSize.Y/oldScale
+                if content>0 then self._floatContentHeight=content end
+                local sf=math.max(.1,math.min(scale.Scale,(v.X-16)/self._floatWidth))
+                self.FloatScale.Scale=sf
+                self._floatHeight=math.max(45,math.min(self._floatContentHeight+28,math.max(45,(v.Y-16)/sf)))
+                self.Float.Size=UDim2.fromOffset(self._floatWidth,self._floatHeight)
+                self:SetPosition(self.Float.Position.X.Offset,self.Float.Position.Y.Offset)
+                self._fitting=false
+            end
+            function s:Detach(x,y)
+                if w.Destroyed or not self.Draggable then return false end
+                if self.IsDetached then if x and y then self:SetPosition(x,y) end; self:BringToFront(); return true end
+                w:ClosePopup()
+                local position=head.AbsolutePosition
+                local originScale=math.max(.01,scale.Scale)
+                self._floatWidth=holder.AbsoluteSize.X>0 and math.max(130,holder.AbsoluteSize.X/originScale) or ((width-sidebarWidth-18)*.5-8)
+                self._floatContentHeight=math.max(1,panel.AbsoluteSize.Y/originScale)
+                self._floatHeight=self._floatContentHeight+28
+                local float=w:Frame(gui,{Name="FloatingSection",Position=UDim2.fromOffset(position.X,position.Y),Size=UDim2.fromOffset(self._floatWidth,self._floatHeight),ZIndex=100,Active=true,ClipsDescendants=true,Visible=w.Visible and self._visible},"Sidebar"); corner(float,5); w:Stroke(float)
+                self.Float=float; self.FloatScale=make("UIScale",{Scale=originScale},float)
+                local scroll=make("ScrollingFrame",{Name="FloatingSectionBody",Position=UDim2.fromOffset(0,24),Size=UDim2.new(1,0,1,-24),Active=true,BorderSizePixel=0,BackgroundTransparency=1,CanvasSize=UDim2.new(),AutomaticCanvasSize=Enum.AutomaticSize.Y,ScrollBarThickness=2,ScrollingDirection=Enum.ScrollingDirection.Y},float)
+                w:Bind(scroll,"ScrollBarImageColor3","Stroke"); self.FloatScroll=scroll
+                self.IsDetached=true; w.DetachedSections[self]=true
+                head.Parent=float; head.Position=UDim2.fromOffset(0,0)
+                panel.Parent=scroll; panel.Position=UDim2.fromOffset(2,0); panel.Size=UDim2.new(1,-4,0,0)
+                holder.Visible=false; dock.Visible=true; grip.Visible=false
+                self._floatSizeConnection=w:Connect(panel:GetPropertyChangedSignal("AbsoluteSize"),function() self:RefreshFloatingBounds() end)
+                self:RefreshFloatingBounds(); self:SetPosition(x or position.X,y or position.Y); self:BringToFront()
+                w:Call(sectionConfig.OnDetach,self); return true
+            end
+            function s:MoveTo(side,index)
+                local target=self.Tab.Columns[(side=="Right" or side==2) and 2 or 1]
+                local others={}; for _,section in ipairs(self.Tab.Sections) do if section~=self and section.Column==target then table.insert(others,section) end end
+                table.sort(others,function(a,b) return a.Container.LayoutOrder<b.Container.LayoutOrder end)
+                index=clamp(math.floor(tonumber(index) or #others+1),1,#others+1); table.insert(others,index,self)
+                column=target; self.Column=target; holder.Parent=target
+                for order,section in ipairs(others) do section.Container.LayoutOrder=order*10 end
+                for _,entry in ipairs(w._searchables) do if entry.Section==self then entry.Column=target end end
+                return true
+            end
+            function s:Dock(activate,side,index)
+                if w.Destroyed then return false end
+                if not self.IsDetached then if side then self:MoveTo(side,index) end; return true end
+                if side then self:MoveTo(side,index) end
+                w:ClosePopup(); self.IsDetached=false; w.DetachedSections[self]=nil
+                if self._floatSizeConnection then self._floatSizeConnection:Disconnect(); self._floatSizeConnection=nil end
+                head.Parent=holder; head.Position=UDim2.fromOffset(0,0)
+                panel.Parent=holder; panel.Position=UDim2.fromOffset(0,0); panel.Size=UDim2.new(1,0,0,0)
+                self.Float:Destroy(); self.Float=nil; self.FloatScroll=nil; self.FloatScale=nil
+                dock.Visible=false; grip.Visible=self.Draggable; holder.Visible=self._visible
+                w:PruneBindings()
+                if activate~=false and w.Visible then self.Tab:Select() end
+                w:Call(sectionConfig.OnDock,self); return true
+            end
+            function s:SetVisible(value)
+                self._visible=value==true
+                if self.IsDetached then self.Float.Visible=self._visible and w.Visible else holder.Visible=self._visible end
+            end
+            w:Connect(dock.Activated,function() s:Dock() end)
+            w:Connect(sectionDrag.InputBegan,function(input)
+                if not s.Draggable or w.Destroyed or not w.Visible or not s._visible then return end
+                if input.UserInputType~=Enum.UserInputType.MouseButton1 and input.UserInputType~=Enum.UserInputType.Touch then return end
+                w:ClosePopup(); s._dragging=true; s._dragInput=input; s._dragStart=input.Position; s._dragMoved=false
+                s._dragOrigin=s.IsDetached and Vector2.new(s.Float.Position.X.Offset,s.Float.Position.Y.Offset) or head.AbsolutePosition
+                if s.IsDetached then s:BringToFront() end
+            end)
+            w:Connect(UIS.InputChanged,function(input)
+                if not s._dragging or w.Destroyed then return end
+                if input~=s._dragInput and not (s._dragInput.UserInputType==Enum.UserInputType.MouseButton1 and input.UserInputType==Enum.UserInputType.MouseMovement) then return end
+                local delta=input.Position-s._dragStart
+                if delta.X*delta.X+delta.Y*delta.Y>=36 then s._dragMoved=true end
+                if not s._dragMoved then return end
+                if not s.IsDetached then s:Detach(s._dragOrigin.X,s._dragOrigin.Y) end
+                s:SetPosition(s._dragOrigin.X+delta.X,s._dragOrigin.Y+delta.Y)
+            end)
+            w:Connect(UIS.InputEnded,function(input)
+                if not s._dragging then return end
+                if input~=s._dragInput and not (s._dragInput.UserInputType==Enum.UserInputType.MouseButton1 and input.UserInputType==Enum.UserInputType.MouseButton1) then return end
+                s._dragging=false
+                if s._dragMoved and s.IsDetached and w.Visible then
+                    local point=input.Position; local p=root.AbsolutePosition; local size=root.AbsoluteSize
+                    if point.X>=p.X and point.X<=p.X+size.X and point.Y>=p.Y and point.Y<=p.Y+size.Y then
+                        local area=pages.AbsolutePosition; local areaSize=pages.AbsoluteSize
+                        if point.X>=area.X and point.X<=area.X+areaSize.X then
+                            local side=point.X<area.X+areaSize.X*.5 and "Left" or "Right"; local target=s.Tab.Columns[side=="Left" and 1 or 2]; local index=1
+                            for _,other in ipairs(s.Tab.Sections) do if other~=s and other.Column==target and not other.IsDetached and point.Y>other.Container.AbsolutePosition.Y+other.Container.AbsoluteSize.Y*.5 then index=index+1 end end
+                            s:Dock(true,side,index)
+                        else s:Dock() end
+                    end
+                end
+            end)
+            table.insert(w.Sections,s)
+            table.insert(w._searchables,{Tab=self,Section=s,Frame=head,Column=column,Title=sectionConfig.Title or "Section",Kind="Section",Search=(sectionConfig.Title or "Section"):lower()})
+            local order=0
+            function s:Row(o,height)
+                order=order+1; local row=w:Frame(panel,{Size=UDim2.new(1,0,0,height or 25),LayoutOrder=order})
+                local label=w:Text(row,o.Title or "Control",{Size=UDim2.new(1,-50,0,22),TextSize=12,TextTruncate=Enum.TextTruncate.AtEnd})
+                if o.Description then row.Size=UDim2.new(1,0,0,(height or 25)+14); w:Text(row,o.Description,{Position=UDim2.fromOffset(0,height or 25),Size=UDim2.new(1,0,0,14),TextSize=10,TextTruncate=Enum.TextTruncate.AtEnd},"Muted") end
+                local entry={Tab=self.Tab,Section=self,Frame=row,Column=column,Title=o.Title or "Control",Kind="Control",Search=((o.Title or "").." "..(o.Description or "")):lower()}; table.insert(w._searchables,entry)
+                return row,label,entry
+            end
+            function s:Register(o,row,default,normalize,render)
+                local control={Frame=row,Title=o.Title or "Control",Value=copy(default),Default=copy(default),Normalize=normalize,Enabled=true,_manualEnabled=o.Enabled~=false,EnabledIf=o.EnabledIf}
+                function control:Get() return copy(self.Value) end
+                function control:Set(value,silent)
+                    self.Value=copy(self:Normalize(value))
+                    self:Refresh()
+                    if self.Keybind and w.RefreshHotkeys then w:RefreshHotkeys() end
+                    if w.RefreshDependencies then w:RefreshDependencies() end
+                    if not silent then w:Call(o.Callback,self:Get(),self.Opacity) end
+                    return self
+                end
+                function control:Refresh() render(self.Value) end
+                local blocker=w:Button(row,{Name="DisabledOverlay",Size=UDim2.fromScale(1,1),ZIndex=190,Visible=false,Active=true},"Panel"); blocker.BackgroundTransparency=.48
+                function control:RefreshEnabled()
+                    local enabled=self._manualEnabled
+                    if type(self.EnabledIf)=="string" then enabled=enabled and w.Flags[self.EnabledIf]~=nil and w.Flags[self.EnabledIf]:Get()==true end
+                    self.Enabled=enabled; blocker.Visible=not enabled
+                end
+                function control:SetEnabled(enabled) self._manualEnabled=enabled==true; self:RefreshEnabled(); return self end
+                function control:SetVisible(visible) row.Visible=visible end
+                function control:Reset(silent) return self:Set(self.Default,silent) end
+                if o.Flag then assert(not w.Flags[o.Flag],"Duplicate flag: "..o.Flag); w.Flags[o.Flag]=control end
+                table.insert(w.Controls,control); control:Set(default,true)
+                return control
+            end
+            function s:AddToggle(o)
+                o=options(o)
+                local row,label,entry=self:Row(o); entry.Kind="Toggle"
+                local hit=w:Button(row,{Size=UDim2.fromScale(1,1)})
+                local track=w:Frame(row,{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,0,0,7),Size=UDim2.fromOffset(25,14)},"Hover"); corner(track,10)
+                local knob=w:Frame(track,{Position=UDim2.fromOffset(3,3),Size=UDim2.fromOffset(9,9)},"Muted"); corner(knob,8)
+                local control=self:Register(o,row,o.Default==true,function(_,v) assert(type(v)=="boolean","Expected boolean"); return v end,function(v)
+                    track.BackgroundColor3=v and w.Theme.Accent:Lerp(w.Theme.Panel,.78) or w.Theme.Hover
+                    tween(knob,{Position=UDim2.fromOffset(v and 13 or 3,3),BackgroundColor3=v and w.Theme.Accent or w.Theme.Muted})
+                end)
+                w:Connect(hit.Activated,function() if control.Enabled then control:Set(not control.Value) end end)
+                if o.Keybind then
+                    assert(validBinding(o.Keybind),"Expected keyboard/mouse binding")
+                    control.Keybind=o.Keybind;control.DefaultKeybind=o.Keybind;control.KeyMode=o.KeyMode or "Toggle";control.HotkeyTitle=o.HotkeyTitle or o.Title
+                    label.Size=UDim2.new(1,-64,0,22)
+                    local gear=w:Button(row,{Name="KeybindSettings",Position=UDim2.new(1,-53,0,4),Size=UDim2.fromOffset(19,19)})
+                    w:Icon(gear,"settings",{Position=UDim2.fromOffset(2,2),Size=UDim2.fromOffset(15,15)})
+                    local keyLabel
+                    function control:SetKeybind(key) assert(validBinding(key),"Expected keyboard/mouse binding");if self.KeyMode=="Hold" and self.Value then self:Set(false) end;self.Keybind=key;if keyLabel and keyLabel.Parent then keyLabel.Text=key.Name end;w:RefreshHotkeys() end
+                    function control:SetKeyMode(mode,silent) assert(mode=="Toggle" or mode=="Hold","Expected Toggle or Hold");self.KeyMode=mode;if mode=="Hold" and self.Value then self:Set(false,silent) end;if self.RefreshKeyMenu then self:RefreshKeyMenu() end end
+                    function control:ResetKeybind() self:SetKeybind(self.DefaultKeybind);self:SetKeyMode("Toggle") end
+                    local function menu()
+                        local frame=w:PopupAt(gear,200,110,{Left=true,OffsetX=-190});control.KeyMenu=frame
+                        w:Text(frame,'"'..(o.Title or "Toggle")..'"',{Position=UDim2.fromOffset(10,5),Size=UDim2.new(1,-20,0,24),TextSize=12,ZIndex=204})
+                        local capture=w:Button(frame,{Name="CaptureBinding",Position=UDim2.fromOffset(10,30),Size=UDim2.new(1,-20,0,29),ZIndex=203},"Panel");corner(capture,3)
+                        keyLabel=w:Text(capture,control.Keybind.Name,{Size=UDim2.fromScale(1,1),TextXAlignment=Enum.TextXAlignment.Center,ZIndex=204});control.BindingLabel=keyLabel
+                        w:Connect(capture.Activated,function() if not w._capturing then w._capturing=control;keyLabel.Text="Press a key..." end end)
+                        local modes={}
+                        local function refresh()
+                            if not frame.Parent then return end
+                            for name,item in pairs(modes) do
+                                local selected=control.KeyMode==name
+                                item.Button.BackgroundTransparency=0;item.Button.Visible=true
+                                item.Button.BackgroundColor3=selected and w.Theme.Accent or w.Theme.Panel
+                                item.Label.TextTransparency=0;item.Label.Visible=true
+                                item.Label.TextColor3=selected and w.Theme.White or w.Theme.Muted
+                            end
+                        end
+                        control.RefreshKeyMenu=refresh;w._modePopupControl=control
+                        for index,mode in ipairs({"Toggle","Hold"}) do
+                            local button=w:Button(frame,{Name="Mode"..mode,Position=UDim2.fromOffset(10+(index-1)*92,68),Size=UDim2.fromOffset(88,32),BackgroundTransparency=0,ZIndex=203});corner(button,3)
+                            local caption=w:Text(button,mode,{Size=UDim2.fromScale(1,1),TextXAlignment=Enum.TextXAlignment.Center,TextSize=12,ZIndex=204})
+                            modes[mode]={Button=button,Label=caption}
+                            w:Connect(button.Activated,function() control:SetKeyMode(mode) end)
+                            w:Connect(button.MouseEnter,function() if control.KeyMode~=mode then button.BackgroundColor3=w.Theme.Hover end end)
+                            w:Connect(button.MouseLeave,refresh)
+                        end
+                        refresh()
+                    end
+                    w:Connect(gear.Activated,menu)
+                    w:Connect(UIS.InputEnded,function(input) if control.KeyMode=="Hold" and bindingMatches(input,control.Keybind) and control.Value then control:Set(false) end end)
+                    w:Connect(UIS.InputBegan,function(input,processed)
+                        if w._capturing==control then
+                            if inputBinding(input) then
+                                if input.KeyCode~=Enum.KeyCode.Escape then control:SetKeybind(inputBinding(input)) elseif keyLabel and keyLabel.Parent then keyLabel.Text=control.Keybind.Name end
+                                task.defer(function() if w._capturing==control then w._capturing=nil end end)
+                            end
+                        elseif not processed and not UIS:GetFocusedTextBox() and not w._capturing and bindingMatches(input,control.Keybind) and control.Enabled then control:Set(control.KeyMode=="Hold" or not control.Value) end
+                    end)
+                    control.KeyButton=gear
+                end
+                if o.Color then
+                    local colorOptions=typeof(o.Color)=="table" and copy(o.Color) or {Default=o.Color}
+                    colorOptions.Title=colorOptions.Title or ((o.Title or "Toggle").." color"); colorOptions.Flag=colorOptions.Flag or o.ColorFlag; colorOptions.Inline=true
+                    local colorControl=self:AddColorPicker(colorOptions); local oldRow=colorControl.Frame
+                    colorControl.Swatch.Parent=row; colorControl.Swatch.Position=UDim2.new(1,-48,0,8); colorControl.Swatch.Size=UDim2.fromOffset(12,12)
+                    for _,entry in ipairs(w._searchables) do if entry.Frame==oldRow then entry.Frame=row end end
+                    colorControl.Frame=row; function colorControl:SetVisible(value) self.Swatch.Visible=value end; oldRow:Destroy(); control.ColorControl=colorControl
+                    label.Size=UDim2.new(1,o.Keybind and -116 or -70,0,22)
+                    if control.KeyButton then control.KeyButton.Position=UDim2.new(1,-100,0,5) end
+                end
+                return control
+            end
+            function s:AddButton(o)
+                o=options(o)
+                local row,label,entry=self:Row(o,32); entry.Kind="Button"; label.Visible=false
+                local b=w:Button(row,{Size=UDim2.new(1,0,0,29)},o.Primary and "Accent" or "Hover"); corner(b,3)
+                local text=w:Text(b,o.Title or "Button",{Size=UDim2.fromScale(1,1),TextSize=12,TextXAlignment=Enum.TextXAlignment.Center},o.Primary and "AccentText" or "Text")
+                if o.Icon then w:Icon(b,o.Icon,{Position=UDim2.fromOffset(8,5),Size=UDim2.fromOffset(13,13)},o.Primary and "AccentText" or "Muted") end
+                w:Connect(b.Activated,function() w:Call(o.Callback) end)
+                return {Frame=row,SetText=function(_,v)
+                    text.Text=tostring(v); entry.Title=text.Text; entry.Search=string.lower(text.Text.." "..(o.Description or ""))
+                    if w._globalQuery and w._globalQuery:match("%S") then w:Filter(w._globalQuery) end
+                end,SetVisible=function(_,v) row.Visible=v end}
+            end
+            function s:AddLabel(o)
+                o=options(o)
+                local auto=o.AutoHeight~=false and (o.Height==nil or o.AutoHeight==true)
+                local row,label,entry=self:Row(o,auto and 0 or (o.Height or 42)); entry.Kind="Label"
+                label.TextWrapped=true; label.TextYAlignment=Enum.TextYAlignment.Top
+                label.TextSize=o.TextSize or 12; label.TextTruncate=Enum.TextTruncate.None
+                if auto then
+                    row.Size=UDim2.new(1,0,0,0); row.AutomaticSize=Enum.AutomaticSize.Y
+                    label.Size=UDim2.new(1,0,0,0); label.AutomaticSize=Enum.AutomaticSize.Y
+                    if o.Description then
+                        for _,child in ipairs(row:GetChildren()) do
+                            if child~=label and child:IsA("TextLabel") then
+                                child.Size=UDim2.new(1,0,0,0); child.AutomaticSize=Enum.AutomaticSize.Y
+                                child.TextWrapped=true; child.TextTruncate=Enum.TextTruncate.None; child.LayoutOrder=2
+                            end
+                        end
+                        label.LayoutOrder=1; list(row,4)
+                    end
+                else label.Size=UDim2.fromScale(1,1) end
+                return {Frame=row,SetText=function(_,v)
+                    label.Text=tostring(v); entry.Title=label.Text; entry.Search=string.lower(label.Text.." "..(o.Description or ""))
+                    if w._globalQuery and w._globalQuery:match("%S") then w:Filter(w._globalQuery) end
+                end,SetVisible=function(_,v) row.Visible=v end}
+            end
+            function s:AddSlider(o)
+                o=options(o)
+                if o.Range then return self:AddRangeSlider(o) end
+                local lo,hi=tonumber(o.Min) or 0,tonumber(o.Max) or 100
+                assert(hi>lo and math.abs(lo)~=math.huge and math.abs(hi)~=math.huge,"Slider limits must be finite")
+                local step=tonumber(o.Step) or 1; assert(step>0 and step~=math.huge,"Step must be finite and positive")
+                local row,label,entry=self:Row(o,25); entry.Kind="Slider"
+                local numberWidth=step<1 and 34 or 52;label.Size=UDim2.new(1,-(numberWidth+144),0,22);w:Bind(label,"TextColor3","Muted")
+                local valueText=w:Bind(make("TextBox",{Name="SliderValue",Position=UDim2.new(1,-(numberWidth+138),0,2),Size=UDim2.fromOffset(numberWidth,20),Text="",ClearTextOnFocus=false,Font=Enum.Font.BuilderSans,TextSize=11,TextXAlignment=Enum.TextXAlignment.Right,BorderSizePixel=0},row),"TextColor3","Muted"); valueText.BackgroundTransparency=1; w:Bind(valueText,"BackgroundColor3","Panel"); corner(valueText,3)
+                local track=w:Frame(row,{Position=UDim2.new(1,-130,0,5),Size=UDim2.fromOffset(130,16)},"Hover"); corner(track,10)
+                local fill=w:Frame(track,{Size=UDim2.fromScale(0,1)},"Accent"); corner(fill,10);make("UIGradient",{Color=ColorSequence.new(C(160,160,160),C(255,255,255))},fill)
+                local knob=w:Frame(track,{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(0,.5),Size=UDim2.fromOffset(9,9)},"Text"); corner(knob,6)
+                local hit=w:Button(row,{Position=UDim2.new(1,-130,0,0),Size=UDim2.fromOffset(130,25)})
+                local control=self:Register(o,row,o.Default or lo,function(_,v)
+                    assert(type(v)=="number" and v==v and math.abs(v)~=math.huge,"Expected finite number")
+                    return clamp(lo+round(v-lo,step),lo,hi)
+                end,function(v)
+                    local alpha=(v-lo)/(hi-lo)
+                    fill.Size=UDim2.fromScale(alpha,1); knob.Position=UDim2.fromScale(alpha,.5)
+                    valueText.Text=string.format("%.4g",v)..(o.Suffix or "")
+                end)
+                local sliding,touch=false,nil
+                local function update(x) control:Set(lo+clamp((x-track.AbsolutePosition.X)/math.max(1,track.AbsoluteSize.X),0,1)*(hi-lo)) end
+                w:Connect(hit.InputBegan,function(input)
+                    if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then if not control.Enabled then return end; sliding=true; touch=input; update(input.Position.X) end
+                end)
+                w:Connect(UIS.InputChanged,function(input)
+                    if sliding and (input==touch or input.UserInputType==Enum.UserInputType.MouseMovement) then update(input.Position.X) end
+                end)
+                w:Connect(UIS.InputEnded,function(input) if input==touch or input.UserInputType==Enum.UserInputType.MouseButton1 then sliding=false end end)
+                w:Connect(UIS.WindowFocusReleased,function() sliding=false;touch=nil end)
+                control.ValueBox=valueText
+                w:Connect(valueText.FocusLost,function() local number=tonumber(valueText.Text:match("^%s*([%+%-]?[%d%.]+)")); if number and control.Enabled then control:Set(number) else control:Refresh() end end)
+                return control
+            end
+            function s:AddRangeSlider(o)
+                o=options(o)
+                local lo,hi=tonumber(o.Min) or 0,tonumber(o.Max) or 100
+                local step=tonumber(o.Step) or 1
+                local function finite(n) return type(n)=="number" and n==n and math.abs(n)~=math.huge end
+                assert(finite(lo) and finite(hi) and hi>lo,"Range Max must exceed finite Min")
+                assert(finite(step) and step>0,"Range Step must be positive and finite")
+                local function snap(v) return clamp(lo+round(v-lo,step),lo,hi) end
+                local row,label,entry=self:Row(o,25); entry.Kind="RangeSlider"
+                local numberWidth=o.Suffix and 68 or 44;label.Size=UDim2.new(1,-(numberWidth+144),0,22);w:Bind(label,"TextColor3","Muted")
+                local valueText=w:Text(row,"",{Name="RangeValue",Position=UDim2.new(1,-(numberWidth+138),0,2),Size=UDim2.fromOffset(numberWidth,20),TextSize=12,TextXAlignment=Enum.TextXAlignment.Right},"Muted")
+                local track=w:Frame(row,{Name="RangeTrack",Position=UDim2.new(1,-130,0,5),Size=UDim2.fromOffset(130,16)},"Hover"); corner(track,10)
+                local fill=w:Frame(track,{Name="RangeFill",Size=UDim2.fromScale(0,1)},"Accent"); corner(fill,10);make("UIGradient",{Color=ColorSequence.new(C(160,160,160),C(255,255,255))},fill)
+                local knobs={}
+                for i=1,2 do
+                    knobs[i]=w:Frame(track,{Name=i==1 and "LowerHandle" or "UpperHandle",AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(0,.5),Size=UDim2.fromOffset(11,11)},"Text")
+                    corner(knobs[i],6)
+                end
+                local hit=w:Button(row,{Name="RangeInput",Position=UDim2.new(1,-130,0,0),Size=UDim2.fromOffset(130,25)})
+                local control=self:Register(o,row,o.Default or {lo,hi},function(_,v)
+                    assert(type(v)=="table" and finite(v[1]) and finite(v[2]),"Expected {minimum, maximum} numeric pair")
+                    local a,b=snap(v[1]),snap(v[2])
+                    if a>b then a,b=b,a end
+                    return {a,b}
+                end,function(v)
+                    local a,b=(v[1]-lo)/(hi-lo),(v[2]-lo)/(hi-lo)
+                    fill.Position=UDim2.fromScale(a,0); fill.Size=UDim2.fromScale(b-a,1)
+                    knobs[1].Position=UDim2.fromScale(a,.5); knobs[2].Position=UDim2.fromScale(b,.5)
+                    local suffix=o.Suffix or ""
+                    valueText.Text=string.format("%.4g",v[1])..suffix.." - "..string.format("%.4g",v[2])..suffix
+                end)
+                control.LowerHandle=knobs[1]; control.UpperHandle=knobs[2]; control.Track=track
+                local active,touch,lastHandle
+                local function at(x)
+                    return snap(lo+clamp((x-track.AbsolutePosition.X)/math.max(1,track.AbsoluteSize.X),0,1)*(hi-lo))
+                end
+                local function update(x)
+                    local pair=control:Get(); local nextValue=at(x)
+                    if active==1 then pair[1]=math.min(nextValue,pair[2]) else pair[2]=math.max(nextValue,pair[1]) end
+                    if pair[1]~=control.Value[1] or pair[2]~=control.Value[2] then control:Set(pair) end
+                end
+                w:Connect(hit.InputBegan,function(input)
+                    if input.UserInputType~=Enum.UserInputType.MouseButton1 and input.UserInputType~=Enum.UserInputType.Touch then return end
+                    if not control.Enabled then return end
+                    local v=at(input.Position.X); local pair=control.Value
+                    if pair[1]==pair[2] then
+                        active=v<pair[1] and 1 or (v>pair[2] and 2 or (lastHandle==1 and 2 or 1))
+                    else active=math.abs(v-pair[1])<=math.abs(v-pair[2]) and 1 or 2 end
+                    touch=input; lastHandle=active; update(input.Position.X)
+                end)
+                w:Connect(UIS.InputChanged,function(input)
+                    if active and (input==touch or input.UserInputType==Enum.UserInputType.MouseMovement) then update(input.Position.X) end
+                end)
+                w:Connect(UIS.InputEnded,function(input)
+                    if input==touch or input.UserInputType==Enum.UserInputType.MouseButton1 then active=nil; touch=nil end
+                end)
+                w:Connect(UIS.WindowFocusReleased,function() active=nil;touch=nil end)
+                return control
+            end
+            function s:AddDropdown(o)
+                o=options(o); local values=copy(o.Options or {"Option"}); assert(#values>0,"Dropdown options cannot be empty")
+                local row,label,entry=self:Row(o,66); entry.Kind="Dropdown"
+                local b=w:Button(row,{Name="DropdownField",Position=UDim2.fromOffset(0,29),Size=UDim2.new(1,0,0,30)},"Panel"); corner(b,3)
+                w:Bind(label,"TextColor3","Muted")
+                local selected=w:Text(b,"",{Position=UDim2.fromOffset(7,0),Size=UDim2.new(1,-29,1,0),TextSize=11,TextTruncate=Enum.TextTruncate.AtEnd},"Muted")
+                local arrow=w:Icon(b,"chevron-down",{Position=UDim2.new(1,-19,0,10),Size=UDim2.fromOffset(12,12)})
+                local control=self:Register(o,row,o.Default or (o.Multi and {} or values[1]),function(_,v)
+                    if o.Multi then assert(type(v)=="table","Expected selected options array"); local result={}; for _,value in ipairs(v) do assert(table.find(values,value),"Unknown option"); if not table.find(result,value) then table.insert(result,value) end end; return result end
+                    assert(table.find(values,v),"Unknown option: "..tostring(v)); return v
+                end,function(v) selected.Text=o.Multi and (#v>0 and table.concat(v,", ") or "None") or tostring(v) end)
+                control.Button=b; control.SelectedLabel=selected
+                w:Connect(b.Activated,function()
+                    if control.Enabled==false then return end
+                    local sf=self.IsDetached and self.FloatScale.Scale or w.Scale.Scale
+                    control.PopupList=w:OptionList(b,values,function(value) return o.Multi and table.find(control.Value,value)~=nil or control.Value==value end,function(value)
+                        if o.Multi then local next=control:Get(); local i=table.find(next,value); if i then table.remove(next,i) else table.insert(next,value) end; control:Set(next)
+                        else control:Set(value);if o.CloseOnSelect then w:ClosePopup() end end
+                    end,{Scale=sf,Multi=o.Multi})
+                    arrow.Rotation=180;w._popupOnClose=function() if arrow.Parent then arrow.Rotation=0 end end
+                end)
+                function control:SetOptions(newOptions)
+                    assert(type(newOptions)=="table" and #newOptions>0,"Expected non-empty options"); values=copy(newOptions)
+                    if o.Multi then local valid={}; for _,value in ipairs(self.Value) do if table.find(values,value) then table.insert(valid,value) end end; self:Set(valid,true)
+                    elseif not table.find(values,self.Value) then self:Set(values[1],true) end
+                    w:ClosePopup()
+                end
+                return control
+            end
+            function s:AddTextbox(o)
+                o=options(o)
+                local row,label,entry=self:Row(o,o.Compact and 32 or 63); entry.Kind="Textbox"
+                local box=w:Bind(make("TextBox",{Position=UDim2.fromOffset(0,o.Compact and 0 or 29),Size=UDim2.new(1,0,0,30),Text="",PlaceholderText=o.Placeholder or "Enter text...",ClearTextOnFocus=false,TextXAlignment=Enum.TextXAlignment.Left,Font=Enum.Font.BuilderSans,TextSize=12,BorderSizePixel=0},row),"BackgroundColor3","Hover")
+                w:Bind(box,"TextColor3","Text"); w:Bind(box,"PlaceholderColor3","Muted"); corner(box,3); pad(box,8,0)
+                if o.Compact then label.Visible=false end
+                w:Bind(label,"TextColor3","Muted")
+                local control=self:Register(o,row,o.Default or "",function(_,v)
+                    assert(type(v)=="string","Expected string"); return v:sub(1,o.MaxLength or 2048)
+                end,function(v) if box.Text~=v then box.Text=v end end)
+                w:Connect(box.FocusLost,function(enter) control:Set(box.Text); w:Call(o.OnEnter,control.Value,enter) end)
+                if o.Live then w:Connect(box:GetPropertyChangedSignal("Text"),function() control:Set(box.Text) end) end
+                return control
+            end
+            function s:AddKeybind(o)
+                o=options(o)
+                local row,label,entry=self:Row(o); entry.Kind="Keybind"
+                local b=w:Button(row,{AnchorPoint=Vector2.new(1,0),Position=UDim2.fromScale(1,0),Size=UDim2.fromOffset(96,26)},"Hover"); corner(b,6)
+                label.Size=UDim2.new(1,-101,0,28)
+                local text=w:Text(b,"",{Size=UDim2.fromScale(1,1),TextSize=12,TextXAlignment=Enum.TextXAlignment.Center})
+                local control=self:Register(o,row,o.Default or Enum.KeyCode.F,function(_,v)
+                    assert(typeof(v)=="EnumItem" and v.EnumType==Enum.KeyCode,"Expected Enum.KeyCode"); return v
+                end,function(v) text.Text=v.Name end)
+                w:Connect(b.Activated,function()
+                    if w._capturing then return end
+                    w._capturing=control; text.Text="Press a key..."
+                end)
+                w:Connect(UIS.InputBegan,function(input,processed)
+                    if w._capturing==control then
+                        if input.KeyCode~=Enum.KeyCode.Unknown then
+                            if input.KeyCode~=Enum.KeyCode.Escape then control:Set(input.KeyCode) else control:Refresh() end
+                            -- Keep capture active until other listeners process this input.
+                            task.defer(function() if w._capturing==control then w._capturing=false end end)
+                        end
+                    elseif not processed and not UIS:GetFocusedTextBox() and not w._capturing and input.KeyCode==control.Value then w:Call(o.OnPressed,control.Value) end
+                end)
+                return control
+            end
+            function s:AddColorPicker(o)
+                o=options(o);if o.ShowHex==nil then o.ShowHex=true end; local row,label,entry=self:Row(o); entry.Kind="ColorPicker"
+                local swatch=w:Button(row,{AnchorPoint=Vector2.new(1,0),Position=UDim2.new(1,0,0,5),Size=UDim2.fromOffset(16,16)},"Accent"); corner(swatch,12); w:Stroke(swatch)
+                local control=self:Register(o,row,o.Default or w.Theme.Accent,function(_,v) assert(typeof(v)=="Color3","Expected Color3"); return v end,function(v) swatch.BackgroundColor3=v end)
+                control.Opacity=clamp(tonumber(o.Alpha) or 1,0,1); control.Animation="None"
+                local set=control.Set
+                function control:Set(value,silent) local normalized=self:Normalize(value); if not self._animating then self._baseColor=normalized end; return set(self,normalized,silent) end
+                function control:GetAlpha() return self.Opacity end
+                function control:SetAlpha(alpha,silent)
+                    assert(type(alpha)=="number" and alpha==alpha and alpha>=0 and alpha<=1,"Opacity must be 0–1")
+                    self.Opacity=alpha; if not self._animating then self._baseAlpha=alpha end; swatch.BackgroundTransparency=1-alpha
+                    if not silent then w:Call(o.Callback,self:Get(),alpha) end
+                end
+                function control:SetAnimation(mode,silent)
+                    assert(table.find({"None","Rainbow","Fade","Fade Alpha"},mode),"Unknown color animation")
+                    if self.Animation=="None" then self._baseColor=self:Get(); self._baseAlpha=self.Opacity end
+                    self.Animation=mode
+                    if self.AnimationLabel and self.AnimationLabel.Parent then self.AnimationLabel.Text=mode end
+                    if mode=="None" then self:Set(self._baseColor or self:Get(),silent); self:SetAlpha(self._baseAlpha or 1,silent) end
+                end
+                function control:StepAnimation(time)
+                    if self.Animation=="None" or not self._baseColor then return end
+                    local hue,sat,val=self._baseColor:ToHSV(); local wave=.5+.5*math.sin(time*2)
+                    self._animating=true
+                    if self.Animation=="Rainbow" then self:Set(Color3.fromHSV((time*.12)%1,math.max(.6,sat),math.max(.7,val)))
+                    elseif self.Animation=="Fade" then self:Set(Color3.fromHSV(hue,sat,val*(.35+.65*wave)))
+                    elseif self.Animation=="Fade Alpha" then self:SetAlpha((self._baseAlpha or 1)*(.15+.85*wave)) end
+                    self._animating=false
+                end
+                control:SetAlpha(control.Opacity,true); control.Swatch=swatch
+                w:Connect(swatch.Activated,function()
+                    if not control.Enabled then return end
+                    local sf=self.IsDetached and self.FloatScale.Scale or w.Scale.Scale
+                    local f=w:PopupAt(swatch,172,219,{Scale=sf}); control.Picker=f
+                    w:Text(f,'"'..(o.Title or "Color")..'"',{Position=UDim2.fromOffset(10,3),Size=UDim2.fromOffset(160,22),ZIndex=204,TextSize=12})
+                    local hue,sat,val=control.Value:ToHSV()
+                    local sv=w:Frame(f,{Position=UDim2.fromOffset(8,27),Size=UDim2.fromOffset(126,126),ZIndex=203}); sv.BackgroundTransparency=0; corner(sv,3)
+                    local white=w:Frame(sv,{Size=UDim2.fromScale(1,1),ZIndex=204},"White"); make("UIGradient",{Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,0),NumberSequenceKeypoint.new(1,1)})},white)
+                    local black=w:Frame(sv,{Size=UDim2.fromScale(1,1),ZIndex=205},"Black"); make("UIGradient",{Rotation=90,Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,1),NumberSequenceKeypoint.new(1,0)})},black)
+                    local cursor=w:Frame(sv,{AnchorPoint=Vector2.new(.5,.5),Size=UDim2.fromOffset(11,11),ZIndex=207}); corner(cursor,8); make("UIStroke",{Color=C(255,255,255),Thickness=1.5},cursor)
+                    local hit=w:Button(sv,{Size=UDim2.fromScale(1,1),ZIndex=208})
+                    local huebar=w:Frame(f,{Position=UDim2.fromOffset(144,27),Size=UDim2.fromOffset(14,126),ZIndex=203},"White"); corner(huebar,3)
+                    local points={}; for i=0,6 do table.insert(points,ColorSequenceKeypoint.new(i/6,Color3.fromHSV(i/6,1,1))) end; make("UIGradient",{Rotation=90,Color=ColorSequence.new(points)},huebar)
+                    local hueCursor=w:Frame(huebar,{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(.5,hue),Size=UDim2.fromOffset(14,5),ZIndex=205},"Text"); corner(hueCursor,5)
+                    local hueHit=w:Button(huebar,{Size=UDim2.fromScale(1,1),ZIndex=208})
+                    local alphaTrack=w:Frame(f,{Name="OpacityTrack",Position=UDim2.fromOffset(8,161),Size=UDim2.fromOffset(126,12),ClipsDescendants=false,ZIndex=203})
+                    alphaTrack.BackgroundTransparency=0;w:Bind(alphaTrack,"BackgroundColor3","Panel")
+                    local alphaFill=w:Frame(alphaTrack,{Size=UDim2.fromScale(1,1),ZIndex=204}); alphaFill.BackgroundTransparency=0; make("UIGradient",{Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,0),NumberSequenceKeypoint.new(1,1)})},alphaFill)
+                    local alphaKnob=w:Frame(alphaTrack,{AnchorPoint=Vector2.new(.5,.5),Position=UDim2.fromScale(1-control.Opacity,.5),Size=UDim2.fromOffset(4,15),ZIndex=205},"Text"); corner(alphaKnob,5)
+                    local alphaHit=w:Button(alphaTrack,{Size=UDim2.fromScale(1,1),ZIndex=208})
+                    local hex
+                    if o.ShowHex then hex=w:Bind(make("TextBox",{Name="HexColor",Position=UDim2.fromOffset(8,183),Size=UDim2.fromOffset(126,25),Text="#"..control.Value:ToHex(),Font=Enum.Font.Code,TextSize=12,ClearTextOnFocus=false,BorderSizePixel=0,ZIndex=204},f),"BackgroundColor3","Panel"); w:Bind(hex,"TextColor3","Text") end
+                    w:Icon(f,"pencil",{Position=UDim2.fromOffset(145,188),Size=UDim2.fromOffset(14,14),ZIndex=205})
+                    local function redraw(commit)
+                        sv.BackgroundColor3=Color3.fromHSV(hue,1,1); cursor.Position=UDim2.fromScale(sat,1-val); hueCursor.Position=UDim2.fromScale(.5,hue)
+                        if commit then control:Set(Color3.fromHSV(hue,sat,val)) end
+                        alphaFill.BackgroundColor3=control.Value; if hex then hex.Text="#"..control.Value:ToHex() end
+                    end
+                    local mode,touch
+                    local function update(input)
+                        if mode=="sv" then sat=clamp((input.Position.X-sv.AbsolutePosition.X)/math.max(1,sv.AbsoluteSize.X),0,1); val=1-clamp((input.Position.Y-sv.AbsolutePosition.Y)/math.max(1,sv.AbsoluteSize.Y),0,1)
+                        elseif mode=="alpha" then control:SetAlpha(1-clamp((input.Position.X-alphaTrack.AbsolutePosition.X)/math.max(1,alphaTrack.AbsoluteSize.X),0,1)); alphaKnob.Position=UDim2.fromScale(1-control.Opacity,.5); return
+                        else hue=clamp((input.Position.Y-huebar.AbsolutePosition.Y)/math.max(1,huebar.AbsoluteSize.Y),0,1) end
+                        redraw(true)
+                    end
+                    local function begin(input,m) if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then mode=m; touch=input; update(input) end end
+                    w:Connect(hit.InputBegan,function(i) begin(i,"sv") end); w:Connect(alphaHit.InputBegan,function(i) begin(i,"alpha") end); w:Connect(hueHit.InputBegan,function(i) begin(i,"hue") end)
+                    table.insert(w._popConnections,UIS.InputChanged:Connect(function(i) if mode and (i==touch or i.UserInputType==Enum.UserInputType.MouseMovement) then update(i) end end))
+                    table.insert(w._popConnections,UIS.InputEnded:Connect(function(i) if i==touch or i.UserInputType==Enum.UserInputType.MouseButton1 then mode=nil end end))
+                    if hex then w:Connect(hex.FocusLost,function() local value=hex.Text:gsub("#",""); if value:match("^%x%x%x%x%x%x$") then hue,sat,val=Color3.fromHex(value):ToHSV(); redraw(true) else redraw(false) end end) end
+                    redraw(false)
+                end)
+                return control
+            end
+            function s:AddDivider(o)
+                o=options(o); local row=self:Row({Title=o.Title or ""},o.Title and 24 or 9)
+                for _,child in ipairs(row:GetChildren()) do if child:IsA("TextLabel") then child.Visible=false end end
+                if o.Title then w:Text(row,o.Title,{Size=UDim2.new(1,0,0,16),TextSize=10},"Muted") end
+                w:Frame(row,{Position=UDim2.new(0,0,1,-3),Size=UDim2.new(1,0,0,1)},"Stroke"); return {Frame=row}
+            end
+            function s:AddListbox(o)
+                o=options(o); local values=copy(o.Options or {}); assert(#values>0,"Listbox needs options")
+                local row,label,entry=self:Row(o,o.Height or 128); label.Size=UDim2.new(1,0,0,20); entry.Kind="Listbox"
+                local scroll=make("ScrollingFrame",{Position=UDim2.fromOffset(0,23),Size=UDim2.new(1,0,1,-26),CanvasSize=UDim2.new(),AutomaticCanvasSize=Enum.AutomaticSize.Y,Active=true,BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=2},row); list(scroll,2); w:Bind(scroll,"ScrollBarImageColor3","Stroke")
+                local buttons={}
+                local control=self:Register(o,row,o.Default or values[1],function(_,v) assert(table.find(values,v),"Unknown listbox value"); return v end,function(v)
+                    for value,entry in pairs(buttons) do entry.Button.BackgroundColor3=value==v and w.Theme.Hover or w.Theme.Panel; entry.Label.TextColor3=value==v and w.Theme.Text or w.Theme.Muted end
+                end)
+                local function renderOptions()
+                    for _,entry in pairs(buttons) do entry.Button:Destroy() end; buttons={}
+                    for _,value in ipairs(values) do
+                        local button=w:Button(scroll,{Size=UDim2.new(1,-4,0,24)},"Panel"); corner(button,3)
+                        local label=w:Text(button,tostring(value),{Position=UDim2.fromOffset(6,0),Size=UDim2.new(1,-12,1,0),TextSize=11})
+                        buttons[value]={Button=button,Label=label}; w:Connect(button.Activated,function() control:Set(value) end)
+                    end
+                    control:Refresh(); w:PruneBindings()
+                end
+                function control:SetOptions(options) assert(type(options)=="table" and #options>0,"Options cannot be empty"); values=copy(options); if not table.find(values,self.Value) then self.Value=values[1] end; renderOptions() end
+                renderOptions(); return control
+            end
+            table.insert(self.Sections,s); return s
+        end
+        function tab:AddConfigManager(o)
+            o=o or {};for _,column in ipairs(self.Columns) do column.Visible=false end
+            local frame=w:Frame(self.Page,{Name="ConfigManager",Size=UDim2.fromScale(1,1)})
+            local input=w:Bind(make("TextBox",{Name="ConfigName",Text="",PlaceholderText="Create a config",ClearTextOnFocus=false,TextSize=12,Font=Enum.Font.BuilderSans,TextXAlignment=Enum.TextXAlignment.Left,BorderSizePixel=0,BackgroundTransparency=1,Size=UDim2.new(1,-44,0,34)},frame),"TextColor3","Text");w:Bind(input,"PlaceholderColor3","Muted");pad(input,10,0)
+            w:Icon(frame,"pencil",{Position=UDim2.new(.45,0,0,10),Size=UDim2.fromOffset(15,15)})
+            local add=w:Button(frame,{Name="CreateConfig",Position=UDim2.new(1,-33,0,6),Size=UDim2.fromOffset(26,26)},"Panel");corner(add,4);w:Icon(add,"plus",{Position=UDim2.fromOffset(6,6),Size=UDim2.fromOffset(14,14)})
+            w:Frame(frame,{Position=UDim2.fromOffset(0,39),Size=UDim2.new(1,0,0,1)},"Stroke")
+            local scroll=make("ScrollingFrame",{Position=UDim2.fromOffset(0,48),Size=UDim2.new(1,0,1,-48),CanvasSize=UDim2.new(),AutomaticCanvasSize=Enum.AutomaticSize.Y,Active=true,BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=2},frame);list(scroll,5)
+            local manager={Frame=frame,Input=input,CreateButton=add,List=scroll}
+            function manager:Refresh()
+                for _,child in ipairs(scroll:GetChildren()) do if child:IsA("Frame") then child:Destroy() end end
+                for index,name in ipairs(w:GetProfileNames()) do
+                    local row=w:Frame(scroll,{Name="Profile_"..name,Size=UDim2.new(1,-3,0,63),LayoutOrder=index},"Panel");row.BackgroundTransparency=.4;corner(row,4)
+                    w:Text(row,name,{Position=UDim2.fromOffset(10,7),Size=UDim2.new(1,-100,0,22),TextSize=12})
+                    w:Text(row,"Creation date: "..(w.ProfileDates[name] or os.date("%d.%m.%Y")),{Position=UDim2.fromOffset(10,30),Size=UDim2.new(1,-100,0,17),TextSize=10},"Muted")
+                    local remove=w:Button(row,{Name="Delete",Position=UDim2.new(1,-78,0,18),Size=UDim2.fromOffset(26,28)});w:Icon(remove,"trash-2",{Position=UDim2.fromOffset(5,5),Size=UDim2.fromOffset(16,16)})
+                    local load=w:Button(row,{Name="Load",Position=UDim2.new(1,-39,0,18),Size=UDim2.fromOffset(27,28)},"Panel");corner(load,4);w:Icon(load,"play",{Position=UDim2.fromOffset(6,6),Size=UDim2.fromOffset(15,15)})
+                    if w.ActiveProfile==name then load.BackgroundColor3=w.Theme.Accent end
+                    w:Connect(remove.Activated,function() w:DeleteProfile(name);self:Refresh() end)
+                    w:Connect(load.Activated,function() local ok,err=w:LoadProfile(name);if ok then self:Refresh() else w:Notify({Title=err}) end end)
+                end
+                w:PruneBindings()
+            end
+            function manager:Create(name)
+                if type(name)~="string" or not name:match("%S") then return false,"Enter a config name" end
+                local ok,err=w:SaveProfile(name);if ok then w.ActiveProfile=name;w.ProfileDates[name]=os.date("%d.%m.%Y");input.Text="";self:Refresh() end;return ok,err
+            end
+            w:Connect(add.Activated,function() local ok,err=manager:Create(input.Text);if not ok then w:Notify({Title=err}) end end)
+            w:Connect(input.FocusLost,function(enter) if enter then local ok,err=manager:Create(input.Text);if not ok then w:Notify({Title=err}) end end end)
+            self.ConfigManager=manager;manager:Refresh();return manager
+        end
+        table.insert(category.Tabs,tab); table.insert(self.Tabs,tab)
+        if not self.ActiveTab then tab:Select() else tab:Refresh() end
+        return tab
+    end
+    function w:ExportConfig()
+        local data={Format="SeniorOrbit",Version=1,Values={},Opacity={},Bindings={},KeyModes={},Animations={},Casing=self.Casing,Palette={},Theme=self.ThemeName,MenuKey=self.Keybind.Name,Watermark=self.Watermark.Visible,Hotkeys=self.Hotkeys.Visible}
+        for token,color in pairs(self.Theme) do data.Palette[token]=color:ToHex() end
+        for flag,control in pairs(self.Flags) do
+            local value=control._baseColor or control:Get()
+            if typeof(value)=="Color3" then value={Type="Color3",Hex=value:ToHex()} end
+            if typeof(value)=="EnumItem" then value={Type="KeyCode",Name=value.Name} end
+            data.Values[flag]=value
+            if control.Opacity~=nil then data.Opacity[flag]=control._baseAlpha or control.Opacity end
+            if control.Keybind then data.Bindings[flag]=control.Keybind.Name; data.KeyModes[flag]=control.KeyMode end
+            if control.Animation then data.Animations[flag]=control.Animation end
+        end
+        return HttpService:JSONEncode(data)
+    end
+    function w:ImportConfig(json,fireCallbacks)
+        local ok,data=pcall(HttpService.JSONDecode,HttpService,json)
+        if not ok or type(data)~="table" or data.Format~="SeniorOrbit" or data.Version~=1 or type(data.Values)~="table" then return false,"Invalid Compact config" end
+        if (data.Watermark~=nil and type(data.Watermark)~="boolean") or (data.Hotkeys~=nil and type(data.Hotkeys)~="boolean") then return false,"Invalid HUD visibility" end
+        local pending,alphas,bindings,palette,keymodes,animations={},{},{},{},{},{}
+        local function key(name)
+            local valid,value=pcall(function() return (tostring(name):match("^MouseButton[123]$") and Enum.UserInputType or Enum.KeyCode)[name] end); if valid and value and value~=Enum.KeyCode.Unknown then return value end
+        end
+        for flag,value in pairs(data.Values) do
+            local c=self.Flags[flag]
+            if c then
+                if type(value)=="table" and value.Type=="Color3" then
+                    if type(value.Hex)~="string" or not value.Hex:match("^%x%x%x%x%x%x$") then return false,"Invalid color" end; value=Color3.fromHex(value.Hex)
+                elseif type(value)=="table" and value.Type=="KeyCode" then value=key(value.Name); if not value then return false,"Invalid key" end end
+                local valid,normalized=pcall(c.Normalize,c,value); if not valid then return false,"Invalid value: "..flag end
+                table.insert(pending,{c,normalized})
+            end
+        end
+        if data.Opacity~=nil and type(data.Opacity)~="table" then return false,"Invalid opacity map" end
+        for flag,value in pairs(data.Opacity or {}) do
+            if self.Flags[flag] and self.Flags[flag].SetAlpha then
+                if type(value)~="number" or value~=value or value<0 or value>1 then return false,"Invalid opacity" end; table.insert(alphas,{self.Flags[flag],value})
+            end
+        end
+        if data.Bindings~=nil and type(data.Bindings)~="table" then return false,"Invalid binding map" end
+        for flag,value in pairs(data.Bindings or {}) do
+            if self.Flags[flag] and self.Flags[flag].SetKeybind then local k=key(value); if not k then return false,"Invalid binding" end; table.insert(bindings,{self.Flags[flag],k}) end
+        end
+        if data.Palette~=nil and type(data.Palette)~="table" then return false,"Invalid palette" end
+        for token,value in pairs(data.Palette or {}) do
+            if self.Theme[token] then if type(value)~="string" or not value:match("^%x%x%x%x%x%x$") then return false,"Invalid palette color" end; palette[token]=Color3.fromHex(value) end
+        end
+        local menu=data.MenuKey and key(data.MenuKey) or self.Keybind; if not menu or menu.EnumType~=Enum.KeyCode then return false,"Invalid menu key" end
+        if data.Theme and not themes[data.Theme] then return false,"Unknown theme" end
+        if data.Casing~=nil and not table.find({"Normal","Lower Case","Upper Case","Bold Case"},data.Casing) then return false,"Invalid casing" end
+        if data.KeyModes~=nil and type(data.KeyModes)~="table" then return false,"Invalid key mode map" end
+        for flag,mode in pairs(data.KeyModes or {}) do if self.Flags[flag] and self.Flags[flag].SetKeyMode then if mode~="Toggle" and mode~="Hold" then return false,"Invalid key mode" end; table.insert(keymodes,{self.Flags[flag],mode}) end end
+        if data.Animations~=nil and type(data.Animations)~="table" then return false,"Invalid animation map" end
+        for flag,mode in pairs(data.Animations or {}) do if self.Flags[flag] and self.Flags[flag].SetAnimation then if not table.find({"None","Rainbow","Fade","Fade Alpha"},mode) then return false,"Invalid animation" end; table.insert(animations,{self.Flags[flag],mode}) end end
+        -- All fields validated before any change.
+        if data.Theme then self.ThemeName=data.Theme end
+        for token,color in pairs(palette) do self.Theme[token]=color end; self.Theme.AccentText=accentInk(self.Theme.Accent); self.Keybind=menu
+        for _,entry in ipairs(bindings) do entry[1]:SetKeybind(entry[2]) end
+        for _,entry in ipairs(pending) do if entry[1].SetAnimation then entry[1]:SetAnimation("None",true) end end
+        for _,entry in ipairs(alphas) do entry[1]:SetAlpha(entry[2],true) end
+        for _,entry in ipairs(pending) do entry[1]:Set(entry[2],fireCallbacks~=true) end
+        for _,entry in ipairs(keymodes) do entry[1]:SetKeyMode(entry[2],true) end
+        for _,entry in ipairs(animations) do entry[1]:SetAnimation(entry[2],true) end
+        if data.Casing then self:SetCasing(data.Casing) end
+        if data.Watermark~=nil then self:SetWatermarkVisible(data.Watermark) end
+        if data.Hotkeys~=nil then self:SetHotkeysVisible(data.Hotkeys) end
+        self:RefreshTheme(); return true
+    end
+    local profileStore=config.ProfileStore or {};profileStore.Profiles=profileStore.Profiles or {};assert(profileStore.Dates==nil or type(profileStore.Dates)=="table","ProfileStore.Dates must be a table");profileStore.Dates=profileStore.Dates or {};w.Profiles=profileStore.Profiles;w.ProfileDates=profileStore.Dates
+    function w:SetAutoload(name) if not self.Profiles[name] then return false,"Profile not found" end; profileStore.Autoload=name; return true end
+    function w:GetAutoload() return profileStore.Autoload end
+    function w:ClearAutoload() profileStore.Autoload=nil; return true end
+    function w:LoadAutoload() if not profileStore.Autoload then return false,"No autoload selected" end; return self:LoadProfile(profileStore.Autoload) end
+    function w:GetProfileNames() local names={}; for name in pairs(self.Profiles) do table.insert(names,name) end; table.sort(names); return names end
+    function w:SaveProfile(name,overwrite)
+        if type(name)~="string" or not name:match("%S") or #name>60 then return false,"Profile name must contain 1–60 characters" end
+        if self.Profiles[name] and not overwrite then return false,"Profile already exists" end
+        self.Profiles[name]=self:ExportConfig();self.ProfileDates[name]=self.ProfileDates[name] or os.date("%d.%m.%Y"); return true
+    end
+    function w:LoadProfile(name) if not self.Profiles[name] then return false,"Profile not found" end;local ok,err=self:ImportConfig(self.Profiles[name],false);if ok then self.ActiveProfile=name end;return ok,err end
+    function w:DeleteProfile(name) if not self.Profiles[name] then return false,"Profile not found" end; self.Profiles[name]=nil;self.ProfileDates[name]=nil;if self.ActiveProfile==name then self.ActiveProfile=nil end; if self:GetAutoload()==name then self:ClearAutoload() end; return true end
+    function w:RefreshToasts()
+        for i,toast in ipairs(self._toasts) do toast.Position=UDim2.fromOffset(12,12+(i-1)*(30*scale.Scale+5)); local sf=toast:FindFirstChild("ToastScale"); if sf then sf.Scale=scale.Scale end end
+    end
+    function w:Notify(o)
+        if self.Destroyed or self.HideNotifications then return end; o=options(o); local title=tostring(o.Title or "Senior Orbit")
+        local row=self:Frame(gui,{Name="Notification",Position=UDim2.fromOffset(12,12),Size=UDim2.fromOffset(clamp(#title*5.5+32,120,300),30),ZIndex=300},"Sidebar"); corner(row,4); self:Stroke(row); make("UIScale",{Name="ToastScale",Scale=scale.Scale},row)
+        self:Icon(row,o.Icon or "check",{Position=UDim2.fromOffset(7,8),Size=UDim2.fromOffset(13,13),ZIndex=301},"Accent")
+        self:Text(row,title,{Position=UDim2.fromOffset(27,0),Size=UDim2.new(1,-33,1,0),TextSize=10,TextTruncate=Enum.TextTruncate.AtEnd,ZIndex=301})
+        table.insert(self._toasts,row); if #self._toasts>3 then table.remove(self._toasts,1):Destroy() end; self:RefreshToasts()
+        task.delay(math.max(.5,tonumber(o.Duration) or 3),function() if self.Destroyed then return end; local i=table.find(self._toasts,row); if i then table.remove(self._toasts,i); row:Destroy(); self:PruneBindings(); self:RefreshToasts() end end)
+    end
+    w:RefreshHotkeys()
+    w:Connect(UIS.WindowFocusReleased,function() for _,control in ipairs(w.Controls) do if control.KeyMode=="Hold" and control.Value then control:Set(false) end end end)
+    local animationTime=0;local metricTime=0;local smoothFPS=60
+    w:Connect(game:GetService("RunService").RenderStepped,function(dt)
+        local delta=tonumber(dt) or 1/60;animationTime=animationTime+delta;metricTime=metricTime+delta
+        if delta>0 then smoothFPS=smoothFPS*.9+(.1/delta) end
+        if metricTime>=.5 and not config.WatermarkText and not w.CustomWatermark then
+            metricTime=0;local ping=0
+            pcall(function() ping=game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue() end)
+            w.WatermarkText.Text="Senior Hub • Sources  |  "..(player and player.DisplayName or "Player").."  |  "..(config.MapName or game.Name or "Roblox").."  |  "..math.floor(smoothFPS+.5).." FPS  |  "..math.floor(ping+.5).." ms  |  "..os.date("%H:%M:%S");w:FitWatermark()
+        end
+        for _,control in ipairs(w.Controls) do if w.Destroyed then break end; if control.StepAnimation then control:StepAnimation(animationTime) end end
+    end)
+    return w
+end
+Library.Themes=themes; Library.Icons=Icons
+return Library
