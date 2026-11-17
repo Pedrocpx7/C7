@@ -4,7 +4,7 @@ local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local HttpService = game:GetService("HttpService")
 local TextService = game:GetService("TextService")
-local Library = {Version = "1.0.2", Name="Senior Orbit"}
+local Library = {Version = "1.0.2", Name="Infernity Hub"}
 local Icons = {
     ["play"] = "rbxassetid://135609604299893",
     ["pencil"] = "rbxassetid://137986121120732",
